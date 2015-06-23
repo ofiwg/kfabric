@@ -1,2 +1,2 @@
 # kfabric
-Experimental Linux kernel fabic interface fir storage.
+Experimental Linux kernel fabic interface for storage.
