@@ -1,5 +1,8 @@
-This file describes how the developer side of man pages work in
-libfabric.
+This file describes how the developer side of doc pages work in kfabric.
+
+*** This needs to be fixed such that .txt files are generated instead
+of man pages. Perhaps .md ->html->.txt ? Might work until the kfabric
+API is defined.
 
 The Definitive Source Of Truth man pages are the Markdown man pages in
 this directory (i.e., the files ending in .<digit>.md.  If you want to
@@ -11,11 +14,11 @@ are generated.
 The Markdown web pages are rendered in two different ways:
 
 1. Nroff man pages.  These man pages are put into the `master` branch
-   and later included in libfabric distribution tarballs.
+   and later included in kfabric distribution tarballs.
 
-2. HTML.  The http://ofiwg.github.io/libfabric/ web site (which is
+2. HTML.  The http://ofiwg.github.io/kfabric/ web site (which is
    served by the Github web servers) automatically renders the content
-   of the `gh-pages` branch of the libfabric repo.
+   of the `gh-pages` branch of the kfabric repo.
 
 Markdown syntax
 ===============
@@ -27,10 +30,10 @@ The canonical reference for Markdown is here:
 
     http://daringfireball.net/projects/markdown/syntax
 
-Note, however, that the libfabric Markdown man pages are served via
+Note, however, that the kfabric Markdown man pages are served via
 the Github Pages web servers, which use a system called Jekyll to
 render the Markdown into HTML (https://github.com/jekyll/jekyll).
-As such, there are a few Jekyll annotations in the libfabric Markdown
+As such, there are a few Jekyll annotations in the kfabric Markdown
 pages (so that they can be served up properly from Github's web
 servers).
 
@@ -44,8 +47,8 @@ small number differences and quirks with which you should be familiar:
 
 ---
 layout: page
-title: fabric(7)
-tagline: Libfabric Programmer's Manual
+title: kfabric(7)
+tagline: kfabric Programmer's Manual
 ---
 {% include JB/setup %}
 
@@ -77,11 +80,11 @@ void my_c_code(void) {
    "c" out of the first directive if your multi-line block is not C
    code, and then it won't do C syntax highlighting.
 
-3. The libfabric man pages are full of 2-level lists of things.  E.g.,
+3. The kfabric man pages are full of 2-level lists of things.  E.g.,
    lists of functions, and then in some of the functions, there is a
    sub-list of flags that can be used with that function.  
 
-   The convention used in the libfabric man pages is to highlight a
+   The convention used in the kfabric man pages is to highlight a
    word/phrase representing each list item.  Then use a ":" to start
    the next line that describes that item.  For example:
 
@@ -107,7 +110,7 @@ void my_c_code(void) {
   FI_WRITE flag is not set, then the application may not invoke
   fi_cq_write of fi_cq_writeerr.
 
-4. There's a small number of places in the libfabric man pages where
+4. There's a small number of places in the kfabric man pages where
    there are unnumbered lists with deliberate line breaks.  For
    example:
 
@@ -174,7 +177,7 @@ The workflow is like this:
        the last person who ran it.  Please only check in your changes,
        if possible.
 
-   3b. Check out the `gh-pages` branch from libfabric and copy any
+   3b. Check out the `gh-pages` branch from kfabric and copy any
        modified Markdown pages into the "master/man" directory (i.e.,
        the directory for man pages from the master development
        branch).
