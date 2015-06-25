@@ -42,17 +42,17 @@ creset:
 help:
 	@echo "make load	# load getinfo test, see dmesg output"
 	@echo "make unload	# unload getinfo test"
-	@echo "make kfi_load	# load kfi + rds + ibv providers"
+	@echo "make kfi_load	# load kfi + verbs provider"
 	@echo "make kcheck	# check if any kfi* modules loaded"
 	@echo "make reset	# unload $(MOD) and clear dmesg"
 
 kfi_unload:
-	-rmmod kfip_ibv
+	-rmmod kfip_verbs
 	-rmmod kfi
 
 kfi_load:
 	-insmod $(KFI_TOP)/kfi/kfi.ko
-	insmod $(KFI_TOP)/prov/ibverbs/kfip_ibv.ko
+	insmod $(KFI_TOP)/prov/verbs/kfip_verbs.ko
 
 kcheck:
 	@lsmod | fgrep  kf; if [ $$? -eq 1 ] ; then echo "kf* not loaded" ; fi

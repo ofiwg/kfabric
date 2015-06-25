@@ -1,8 +1,8 @@
 # build kfi modules and provider tests.
 
-IBV_SUBDIRS=prov/ibverbs
+VERBS_SUBDIRS=prov/verbs
 
-PROVIDERS=kfi $(IBV_SUBDIRS)
+PROVIDERS=kfi $(VERBS_SUBDIRS)
 
 TESTS=tests
 
@@ -33,12 +33,12 @@ clean:
 	done
 
 
-kfi_ib_load:
+kfi_verbs_load:
 	( pushd kfi > /dev/null; make load; popd > /dev/null )
-	( pushd prov/ibverbs > /dev/null; make load; popd > /dev/null )
+	( pushd prov/verbs > /dev/null; make load; popd > /dev/null )
 
-kfi_ib_unload:
-	( pushd prov/ibverbs > /dev/null; make unload; popd > /dev/null )
+kfi_verbs_unload:
+	( pushd prov/verbs > /dev/null; make unload; popd > /dev/null )
 	( pushd kfi > /dev/null; make unload; popd > /dev/null )
 
 kcheck:
@@ -48,6 +48,6 @@ help:
 	@echo "  make or make all    - to build kfi kernel modules" 
 	@echo "  make clean          - to rm kfi kernel modules" 
 	@echo "  make kcheck         - to list kfi kernel modules" 
-	@echo "  make kfi_ib_load    - to load kfi+ib-provider kernel modules" 
-	@echo "  make kfi_ib_unload  - to rm kfi kernel modules" 
+	@echo "  make kfi_verbs_load - to load kfi+ib-provider kernel modules" 
+	@echo "  make kfi_verbs_unload - to rm kfi kernel modules" 
 

@@ -3,7 +3,7 @@
 KFI_TOP=$(shell pwd)/../..
 KFI=$(KFI_TOP)/kfi
 
-MOD=kfip_ibv
+MOD=kfip_verbs
 
 ifneq ("","$(wildcard /usr/src/compat-rdma)")
   #for OFED-3.12

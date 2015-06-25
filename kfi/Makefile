@@ -1,5 +1,5 @@
 # build out-of-tree kernel module: kfi (Kernel Fabric Interface)
-# kfi exports kfi_* kfi API
+# kfabric module exports kfi_* kfi API
 
 MOD=kfabric
 

@@ -62,10 +62,4 @@ CONFIG_COMPAT_IS_KTHREAD before the '#ifndef CONFIG_COMPAT_IS_KTHREAD' line.
 Things to do
 ------------
 
-Update to 'offical' libfabric v1.0, current code is based on libfabric 1.0-rc3,
- rc6 became offical 1.0.
-
-Remove all instances of FI_* error codes, replace with std linux errno.h codes.
-
-Set fi_strerror() full-text under KFI_DEBUG.
-
+Please see TODO file.

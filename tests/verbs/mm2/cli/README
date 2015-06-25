@@ -1,5 +1,5 @@
 
-KFI/Infiniband provider test: client side.
+KFI/verbs provider test: client side.
 
   Pass multiple message of specified len in bytes
 

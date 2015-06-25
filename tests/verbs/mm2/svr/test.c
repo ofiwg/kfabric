@@ -45,7 +45,7 @@
 #include <net/kfi/fi_tagged.h>
 #include <net/kfi/fi_cm.h>
 
-#define DRV_NAME "kfit_ibv_svr"
+#define DRV_NAME "kfit_verbs_svr"
 
 #include <common.h>
 
