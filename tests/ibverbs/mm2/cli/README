@@ -1,0 +1,18 @@
+
+KFI/Infiniband provider test: client side.
+
+  Pass multiple message of specified len in bytes
+
+Adjust SVR=ipAddr in Makefile to send to correct server: default 192.168.x.y
+
+make kfi_load	# if needed
+
+make load	# load client, server is waiting for client to connect.
+		# Ergo, server module is loaded 1st.
+		# Makefile load: for details
+		# defaults: num_msgs=1 msg_len=128
+
+make unload	# unloads module
+make reset	# unloads module and clears dmesg output.
+make kcheck	# find all loaded kfi modules
+

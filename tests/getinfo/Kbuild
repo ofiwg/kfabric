@@ -1,0 +1,9 @@
+
+MOD=kfit-info
+
+obj-m := $(MOD).o
+
+$(MOD)-y := main.o fi_tostr.o
+
+ccflags-y += -I$(src)/../../include
+

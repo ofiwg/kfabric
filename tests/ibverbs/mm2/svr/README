@@ -1,0 +1,16 @@
+[ Thu Feb 26 15:15:24 PST 2015 ] stan
+
+KFI/Infiniband provider test: server side.
+	Pass multiple messages with post_depth,
+	specified msg len in bytes.
+	private data checking
+	CQ depth > 1
+
+make kfi_load	# loads: kfi, IB provider
+make load	# server waits for client to connect.
+		# Makefile load tag for details
+
+make unload	# unload module
+make reset	# unload module and clears dmesg file
+make regress	# std regression test: both cli & server
+make kcheck	# find all loaded 'kfi' modules

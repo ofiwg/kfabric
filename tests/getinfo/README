@@ -1,0 +1,7 @@
+
+kfi 1.0 tool: output formatted description of available fi_info records.
+
+make load
+dmesg		# to view output
+make unload
+
