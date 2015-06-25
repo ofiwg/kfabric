@@ -1,0 +1,12 @@
+
+kfabric (Kernel Fabric Interface) 
+	This module exports the kfi API (resolve fi_* symbols here).
+
+make
+make load
+make unload
+make kcheck	check if kfabric module is loaded
+
+Load a provider and you are ready for kfi adventures.
+
+develpment status:	pre-alpha.
