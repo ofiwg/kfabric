@@ -47,7 +47,7 @@
 #include <net/kfi/fi_cm.h>
 #include <net/kfi/fi_eq.h>
 
-#define DRV_NAME "kfit_ibv_cli"
+#define DRV_NAME "kfit_verbs_cli"
 
 #include <common.h>
 

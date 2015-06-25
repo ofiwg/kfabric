@@ -1,5 +1,5 @@
 SUBDIRS= getinfo				\
-	ibverbs/mm2/svr ibverbs/mm2/cli
+	verbs/mm2/svr verbs/mm2/cli
 
 all:
 	@for d in $(SUBDIRS); do \

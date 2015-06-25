@@ -1,7 +1,7 @@
 
 # Kernel Fabric Interface Provider - IBV (InfiniBand Verbs provider)
 
-MOD=kfip_ibv
+MOD=kfip_verbs
 
 obj-m := $(MOD).o
 

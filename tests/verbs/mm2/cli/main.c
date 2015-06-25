@@ -35,13 +35,14 @@
 #include <linux/kthread.h>
 #include <linux/sched.h>
 #include <linux/delay.h>
+#include <linux/time.h>
 
-#define DRV_NAME "kfit_ibv_mm2_svr"
+#define DRV_NAME "kfit_verbs_mm2_cli"
 
 #include <common.h>
 
 MODULE_LICENSE("Dual BSD/GPL");
-MODULE_DESCRIPTION("Kernel Fabric Interface test (multi_msg) server side");
+MODULE_DESCRIPTION("Kernel Fabric Interface test (verbs) client side");
 MODULE_AUTHOR("Jay E. Sternberg <jay.e.sternberg@intel.com>");
 
 MODULE_PARAM(debug, debug_level, int, -1, "Debug: 0-none, 1-some, 2-all");
@@ -51,7 +52,7 @@ static struct task_struct	*thread;
 
 static int test_thread(void *arg)
 {
-	int			ret = 0;
+	int			i;
 #if 0
 	static const struct sched_param param = { .sched_priority = 0 };
 
@@ -59,36 +60,36 @@ static int test_thread(void *arg)
 	msleep(100);
 	schedule();
 #endif
-
-	print_msg("Kthread Connecting...\n");
-	ret = create_connection();
-	if (ret) {
+	print_msg("Kthread: Connecting...\n");
+	i = create_connection();
+	if (i) {
+		print_err("ERR: connect_2_server() failed(%d)\n", i);
 		thread = NULL;
 		running = 0;
-		print_err("ERR: connect_2_server() failed(%d)\n", ret);
 		return -1;
 	}
-	print_msg("Kthread Connected.\n");
+	print_msg("Kthread: Connected.\n");
 
-	ret = do_test();	/* see test.c */
+	do_test();
 
-	print_msg("Kthread disconnecting...\n");
+	print_msg("Kthread: Disconnecting...\n");
 	destroy_connection();
 	print_msg("Kthread: Test Finished.\n");
 
 	running = 0;
-	print_msg("Kthread Exit.\n");
+	thread = NULL;
 
+	print_msg("Kthread: Exit\n");
 	return 0;
 }
 
-
 static int init(void)
 {
-	print_msg("module loading...\n");
+	print_msg("module loading\n");
 
 	running = 1;
-	thread = kthread_run(test_thread, NULL, DRV_NAME);
+
+	thread = kthread_run(test_thread, NULL, DRV_NAME "thread");
 	if (IS_ERR(thread)) {
 		print_err("kthread_create returned %ld\n", PTR_ERR(thread));
 		thread = NULL;
@@ -104,11 +105,11 @@ module_init(init);
 static void cleanup(void)
 {
 	print_msg("module unloading...\n");
-	if (thread && running) {
+	if (thread) {
 		kthread_stop(thread);
 		while (running)
 			msleep(25);
 	}
-	print_dbg("module unloaded.\n");
+	print_msg("module unloaded.\n");
 }
 module_exit(cleanup);

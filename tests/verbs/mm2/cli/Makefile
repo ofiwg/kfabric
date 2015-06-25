@@ -1,7 +1,7 @@
 KFI_TOP ?=$(shell pwd)/../../../..
 KFI=$(KFI_TOP)/kfi
 
-MODULE_NAME=kfit_ibv_mm2_srv
+MODULE_NAME=kfit_verbs_mm2_cli
 
 ifneq ("","$(wildcard /usr/src/compat-rdma)")
   #for OFED-3.12
@@ -48,8 +48,9 @@ KBUILD_SRC=$(KDIR)
 
 obj-m += $(MODULE_NAME).o
 
-$(MODULE_NAME)-y := test.o
-$(MODULE_NAME)-y += main.o
+$(MODULE_NAME)-y := \
+	main.o \
+	test.o
 
 ccflags-y += -I$(src)/..
 
@@ -66,17 +67,21 @@ main.o: main.c Makefile
 test.o: test.c Makefile
 
 LOC:=$(shell ip addr show ib0 | fgrep 'inet ' | cut -f 6 -d' ' | cut -f 1 -d '/')
-LEN ?=128	# payload length
-NM ?=1		# total num msgs
-PD ?=1		# post-depth
-ARGS=local_ipaddr=$(LOC) msg_len=$(LEN) num_msgs=$(NM) post_depth=$(PD) verify=0 debug=0
+# must match what is defined in svr/Makefile
+LEN ?=128
+NM ?=1
+PD ?=1
 
-load:
-	@echo loading $(MODULE_NAME).ko $(ARGS)
-	@sudo insmod $(MODULE_NAME).ko $(ARGS)
+# IPv4 address of host where server is running.
+#SVR ?=$(LOC)
+SVR ?=10.10.4.41
+
+ARGS=local_ipaddr=$(LOC) svr_ipaddr=$(SVR) msg_len=$(LEN) num_msgs=$(NM) post_depth=$(PD) verify=0 debug=0
+
+load: unload
+	sudo insmod $(MODULE_NAME).ko $(ARGS)
 
 unload:
-	@sudo rmmod ../cli/kfit_ib_mm_cli.ko 2>/dev/null || echo > /dev/null
 	@sudo rmmod $(MODULE_NAME).ko 2>/dev/null || echo > /dev/null
 
 test:
@@ -86,10 +91,10 @@ regress:
 	@make load NM=327680 PD=25 LEN=32768
 
 regress4:
-	@make load NM=4 PD=4
+	@make load NM=4 PD=1
 
 regress20:
-	@make load NM=20 PD=20
+	@make load NM=20
 
 regress24:
 	@make load NM=20 PD=4
@@ -104,34 +109,29 @@ kcheck:
 	@lsmod | fgrep  kfi; if [ $$? -eq 1 ] ; then echo "kfi* not loaded" ; fi
 
 reset:
-	-@sudo rmmod $(MODULE_NAME) 2> /dev/null || echo > /dev/null
-	-@dmesg -c &>/dev/null
+	-@sudo rmmod $(MODULE_NAME) 2>/dev/null || echo > /dev/null
+	-@dmesg -c &> /dev/null
 
 creset:
 	-@sudo rmmod $(MODULE_NAME) 2> /dev/null || echo > /dev/null
 	-@dmesg -c &>/dev/null
 	clear
 
-help:
-	@echo "make all"
-	@echo "make load"
-	@echo "make unload"
-	@echo "make kfi_load"
-	@echo "make kfi_unload"
-	@echo "make check # is $(MODULE_NAME) loaded?"
-	@echo "make kcheck # is kfi* module loaded?"
-	@echo "make reset # unload $(MODULE_NAME) + dmesg -c"
-
 kfi_load: kfi_unload
 	@if [ `lsmod | grep -c rdma` -eq 0 ] ; then sudo modprobe rdma_cm ; fi
 	@echo loading kfi.ko
 	@sudo insmod $(KFI_TOP)/kfi/kfi.ko
-	@echo loading kfip_ibv.ko
-	@sudo insmod $(KFI_TOP)/providers/ibverbs/*.ko
-	@echo loading kfip_rds.ko
-	@sudo insmod $(KFI_TOP)/providers/rds/*.ko
+	@echo loading kfip_verbs.ko
+	@sudo insmod $(KFI_TOP)/providers/verbs/*.ko debug=-1
 
 kfi_unload:
-	@sudo rmmod kfip_rds.ko 2>/dev/null || echo > /dev/null
-	@sudo rmmod kfip_ibv.ko 2>/dev/null || echo > /dev/null
+	@sudo rmmod kfip_verbs.ko 2>/dev/null || echo > /dev/null
 	@sudo rmmod kfi.ko 2>/dev/null || echo > /dev/null
+
+help:
+	@echo "make all"
+	@echo "make load"
+	@echo "make unload"
+	@echo "make check # check if current test module is loaded"
+	@echo "make kcheck # check if nay kfi module is loaded"
+	@echo "make reset # unloads current test module + dmesg -c"
