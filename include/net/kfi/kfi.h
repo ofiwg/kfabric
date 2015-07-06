@@ -33,39 +33,11 @@
 #ifndef _KFI_H_
 #define _KFI_H_
 
-#include <linux/kernel.h>
-#include <linux/module.h>
-#include <linux/byteorder/generic.h>
-#include <linux/slab.h>
-#include <linux/mutex.h>
-#include <linux/string.h>
-
-#include "net/kfi/debug.h"
-
 #define strdup(s) kstrdup(s, GFP_KERNEL)
-
-#include <net/kfi/fabric.h>
-#include <net/kfi/fi_atomic.h>
-
-#ifdef INCLUDE_VALGRIND
-#   include <valgrind/memcheck.h>
-#   ifndef VALGRIND_MAKE_MEM_DEFINED
-#      warning "Valgrind requested, but VALGRIND_MAKE_MEM_DEFINED undefined"
-#   endif
-#endif
-
-#ifndef VALGRIND_MAKE_MEM_DEFINED
-#   define VALGRIND_MAKE_MEM_DEFINED(addr, len)
-#endif
 
 #define ntohll(x) be64_to_cpu(x)
 #define htonll(x) cpu_to_be64(x)
 
 #define sizeof_field(type, field) sizeof(((type *)0)->field)
-
-#define DEFAULT_ABI "FABRIC_1.0"
-
-/* FABRIC_1.0: default symbol set must match linker script */
-#define FABRIC_10(SYM, ESYM) asm(".symver " #SYM","#ESYM"@@FABRIC_1.0");
 
 #endif /* _KFI_H_ */

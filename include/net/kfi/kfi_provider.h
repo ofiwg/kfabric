@@ -33,17 +33,9 @@
 #ifndef _KFI_PROVIDER_H_
 #define _KFI_PROVIDER_H_
 
-#include <linux/kernel.h>
-#include <linux/byteorder/generic.h>
-#include <linux/semaphore.h>
-#include <linux/list.h>
-#include <linux/string.h>
+#include <net/kfi/fabric.h>
 
 #include <net/kfi/kfi.h>
-
-#ifndef strdup
-#define strdup(s) kstrdup((s), GFP_KERNEL)
-#endif
 
 struct kfi_provider {
 	const char *name;
