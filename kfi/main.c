@@ -45,8 +45,11 @@
 #include <linux/sysctl.h>
 #include <linux/proc_fs.h>
 
+#include <net/kfi/fabric.h>
+
 #include "net/kfi/kfi_internal.h"
 #include "net/kfi/kfi_provider.h"
+#include "net/kfi/debug.h"
 
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_DESCRIPTION("Kernel OpenFabrics Interface");

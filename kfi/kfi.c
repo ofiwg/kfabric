@@ -30,11 +30,18 @@
  * SOFTWARE.
  */
 
+#include <linux/string.h>
+#include <linux/slab.h>
+#include <linux/module.h>
+
+#include <net/kfi/fabric.h>
+#include <net/kfi/fi_errno.h>
+#include <net/kfi/fi_atomic.h>
+
 #include <net/kfi/kfi_internal.h>
 #include <net/kfi/kfi_provider.h>
-#include <linux/string.h>
+#include <net/kfi/debug.h>
 
-#include <net/kfi/fi_errno.h>
 
 int kfi_register_provider(uint32_t version, struct kfi_provider *provider)
 {
