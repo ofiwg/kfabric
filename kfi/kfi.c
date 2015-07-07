@@ -36,6 +36,8 @@
 
 #include <net/kfi/fi_errno.h>
 
+void fi_freeinfo_internal(struct fi_info *info);
+
 int kfi_register_provider(uint32_t version, struct kfi_provider *provider)
 {
 	struct kfi_prov *prov;

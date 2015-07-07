@@ -53,6 +53,4 @@ struct kfi_prov {
 	struct kfi_provider	*provider;
 };
 
-extern void fi_freeinfo_internal(struct fi_info *info);
-
 #endif /* _KFI_INTERNAL_H_ */
