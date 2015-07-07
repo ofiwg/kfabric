@@ -14,3 +14,10 @@
 
 5) Complete the verbs provider such that Infiniband & iWARP devices supported.
 
+6) Fix makefiles. Both the kfi and provider makefiles should be made to properly
+   depend on compat-rdma (when available, if not just use system's kernel/IB stack).
+   I think the compat-rdma kernel modules have in mind some sort of scheme where
+   a dependent module includes config.mk in the Makefile, and then includes one
+   or more of the auto-generated headers to pick the right compat defines.
+   However this does not work. Section 4 of the OFED_tips.txt which talks about
+   this is outdated and/or incorrect. Perhaps a bug needs to be filed.

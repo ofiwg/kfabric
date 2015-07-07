@@ -51,15 +51,3 @@ KFI API definition
 1) fi_getinfo() argument 'portnum' is a string in SFI, in KFI it's an integer.
    fi_getinfo() remove node, portnum and flags call argument.
 
-
-KFI using the ibverbs (OFED/InfiniBand) provider
-------------------------------------
-
-1) Out of kernel build Failures due to a bug in OFED-3.12 which is fixed by
-changing /usr/src/compat-rdma/linux/kthread.h to define
-CONFIG_COMPAT_IS_KTHREAD before the '#ifndef CONFIG_COMPAT_IS_KTHREAD' line.
-
-Things to do
-------------
-
-Please see TODO file.

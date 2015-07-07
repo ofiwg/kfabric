@@ -30,8 +30,12 @@
  * SOFTWARE.
  */
 
-#ifndef _TEST_H_
-#define _TEST_H_
+#ifndef _COMMON_H_
+#define _COMMON_H_
+
+/* hack to work around OFED 3.12-1 duplicate defs */
+#define CONFIG_COMPAT_IS_KTHREAD
+#include <linux/kthread.h>
 
 #include <net/kfi/debug.h>
 
@@ -67,4 +71,4 @@ int create_connection(void);
 int do_test(void);
 void destroy_connection(void);
 
-#endif /* _TEST_H_ */
+#endif /* _COMMON_H_ */
