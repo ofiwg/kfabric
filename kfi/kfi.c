@@ -37,10 +37,10 @@
 #include <net/kfi/fabric.h>
 #include <net/kfi/fi_errno.h>
 #include <net/kfi/fi_atomic.h>
-
-#include <net/kfi/kfi_internal.h>
 #include <net/kfi/kfi_provider.h>
-#include <net/kfi/debug.h>
+
+#include "kfi_internal.h"
+#include "debug.h"
 
 
 int kfi_register_provider(uint32_t version, struct kfi_provider *provider)
@@ -468,7 +468,7 @@ struct fi_info *fi_dupinfo(const struct fi_info *info)
 		*dup->domain_attr = *info->domain_attr;
 		if (info->domain_attr->name != NULL) {
 			dup->domain_attr->name =
-						strdup(info->domain_attr->name);
+						kstrdup(info->domain_attr->name, GFP_KERNEL);
 			if (dup->domain_attr->name == NULL)
 				goto fail;
 		}
@@ -481,13 +481,13 @@ struct fi_info *fi_dupinfo(const struct fi_info *info)
 		*dup->fabric_attr = *info->fabric_attr;
 		if (info->fabric_attr->name != NULL) {
 			dup->fabric_attr->name =
-						strdup(info->fabric_attr->name);
+						kstrdup(info->fabric_attr->name, GFP_KERNEL);
 			if (dup->fabric_attr->name == NULL)
 				goto fail;
 		}
 		if (info->fabric_attr->prov_name != NULL) {
 			dup->fabric_attr->prov_name =
-				strdup(info->fabric_attr->prov_name);
+				kstrdup(info->fabric_attr->prov_name, GFP_KERNEL);
 			if (dup->fabric_attr->prov_name == NULL)
 				goto fail;
 		}

@@ -32,11 +32,8 @@
 #include <linux/module.h>
 #include <linux/slab.h>
 
-#include <net/kfi/kfi.h>
-
 #include <net/kfi/fabric.h>
 #include <net/kfi/fi_errno.h>
-
 
 void fi_freeinfo_internal(struct fi_info *info)
 {

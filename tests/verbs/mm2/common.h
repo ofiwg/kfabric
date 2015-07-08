@@ -37,7 +37,7 @@
 #define CONFIG_COMPAT_IS_KTHREAD
 #include <linux/kthread.h>
 
-#include <net/kfi/debug.h>
+#include "debug.h"
 
 #define DRV_PFX "[" DRV_NAME "] "
 
