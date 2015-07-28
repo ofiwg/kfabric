@@ -54,8 +54,7 @@ KBUILD_SRC=$(KDIR)
 obj-m += $(MODULE_NAME).o
 
 $(MODULE_NAME)-y := \
-	main.o \
-	enosys.o
+	main.o
 
 all: $(KSYM)
 	@echo $(PWD)
@@ -67,7 +66,6 @@ clean:
 	@echo Done.
 
 main.o: main.c ibpv.h Makefile
-enosys.o: enosys.c ibpv.h Makefile
 
 info: $(MOD).ko
 	modinfo $(MOD).ko

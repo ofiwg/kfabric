@@ -41,9 +41,6 @@
 #define CONFIG_COMPAT_IS_KTHREAD
 #include <linux/kthread.h>
 
-#include "net/kfi/kfi_provider.h"
-#include "net/kfi/debug.h"
-
 #include <rdma/ib_verbs.h>
 #include <rdma/ib_pack.h>
 #include <rdma/ib_sa.h>
@@ -57,9 +54,9 @@
 #include <net/kfi/fi_eq.h>
 #include <net/kfi/fi_errno.h>
 #include <net/kfi/fi_rma.h>
-#include <net/kfi/fi_tagged.h>
-#include <net/kfi/fi_trigger.h>
-#include <net/kfi/fi_direct.h>
+#include <net/kfi/kfi_provider.h>
+
+#include "debug.h"
 
 #define DRV_NAME		"kfip_ibverbs"
 #define DRV_PFX			"[" DRV_NAME "] "

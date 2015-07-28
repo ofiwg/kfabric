@@ -42,6 +42,11 @@
 #include <linux/inet.h>
 #include <linux/slab.h>
 
+#include <net/kfi/fi_endpoint.h>
+#include <net/kfi/fi_errno.h>
+
+#include "debug.h"
+
 MODULE_LICENSE("Dual BSD/GPL");
 MODULE_DESCRIPTION("Kernel Fabric Interface test: fi_getinfo()");
 MODULE_AUTHOR("Sean Hefty<sean.hefty@intel.com>");
@@ -66,9 +71,6 @@ static char *ibv_ipaddr = LOCAL_IF;
 module_param(ibv_ipaddr, charp, 0000);
 MODULE_PARM_DESC(ibv_ipaddr, " InfiniBand IF IPv4 address");
 
-#include <net/kfi/debug.h>
-#include <net/kfi/fi_endpoint.h>
-#include <net/kfi/fi_errno.h>
 
 char *fi_tostr(const void *data, enum fi_type datatype);
 

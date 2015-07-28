@@ -35,8 +35,6 @@
 
 #include <net/kfi/fabric.h>
 
-#include <net/kfi/kfi.h>
-
 struct kfi_provider {
 	const char *name;
 	uint32_t version;

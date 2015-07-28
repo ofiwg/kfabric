@@ -13,7 +13,7 @@ clean:
 main.o: $(src)/main.c Makefile
 kfi.o: $(src)/kfi.c Makefile
 common.o: $(src)/common.c Makefile
-
+enosys.o: $(src)/enosys.c Makefile
 
 info: $(MOD).ko
 	modinfo $(MOD).ko

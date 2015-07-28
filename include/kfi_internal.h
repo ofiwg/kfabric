@@ -33,13 +33,7 @@
 #ifndef _KFI_INTERNAL_H_
 #define _KFI_INTERNAL_H_
 
-#include <linux/kernel.h>
-#include <linux/byteorder/generic.h>
-#include <linux/list.h>
-#include <linux/mutex.h>
-#include <linux/string.h>
-
-#include <net/kfi/kfi.h>
+//#include <net/kfi/kfi.h>
 
 #define DRV_NAME "kfi"
 #define DRV_PFX "[" DRV_NAME "] "
