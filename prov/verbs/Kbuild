@@ -5,7 +5,7 @@ MOD=kfip_verbs
 
 obj-m := $(MOD).o
 
-$(MOD)-y := main.o enosys.o
+$(MOD)-y := main.o
 
 ccflags-y := -I$(src)
 ccflags-y += -I$(src)/../../include

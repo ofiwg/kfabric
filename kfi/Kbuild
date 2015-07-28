@@ -2,7 +2,7 @@ MOD=kfabric
 
 obj-m := $(MOD).o
 
-$(MOD)-y := main.o kfi.o common.o
+$(MOD)-y := main.o kfi.o common.o enosys.o
 
 ccflags-n += -DCONFIG_KFI_DEBUG=1
 ccflags-y += -I$(src)/../include
