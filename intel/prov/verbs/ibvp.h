@@ -37,12 +37,7 @@
 #ifndef _IBVP_H_
 #define _IBVP_H_
 
-/* hack to work around OFED 3.12-1 duplicate defs */
-#define CONFIG_COMPAT_IS_KTHREAD
-#include <linux/kthread.h>
-
 #include "net/kfi/kfi_provider.h"
-#include "net/kfi/debug.h"
 
 #include <rdma/ib_verbs.h>
 #include <rdma/ib_pack.h>

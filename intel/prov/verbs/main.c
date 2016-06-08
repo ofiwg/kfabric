@@ -39,7 +39,7 @@
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/kernel.h>
-
+#include <linux/kthread.h>
 #include <linux/netdevice.h>
 #include <linux/inetdevice.h>
 #include <linux/net.h>
@@ -50,6 +50,7 @@
 #include <linux/uio.h>
 
 #include <rdma/ib_verbs.h>
+#include <rdma/rdma_cm.h>
 
 #include "ibvp.h"
 
