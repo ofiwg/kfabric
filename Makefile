@@ -9,9 +9,10 @@ KDIR	:= /lib/modules/$(KVER)/build
 PWD	:= $(shell pwd)
 INSTALL_MOD_DIR	:= kfabric
 DEPMOD	:= /usr/sbin/depmod
+KSYM	:= /usr/src/compat-rdma/Module.symvers
 
 default:
-	$(MAKE) -C $(KDIR) M=$(PWD) modules
+	$(MAKE) -C $(KDIR) M=$(PWD) modules KBUILD_EXTRA_SYMBOLS+='$(KSYM)'
 
 install:
 	$(MAKE) INSTALL_MOD_DIR=$(INSTALL_MOD_DIR) -C $(KDIR) M=$(PWD) modules_install
