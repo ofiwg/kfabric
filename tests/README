@@ -5,4 +5,5 @@ getinfo/	fi_getinfo() test - dumps all fi_info records.
 
 ibverbs/	kfi over Infiniband provider tests
 	mm2/	Tx/Rx multiple messages between client & server.
+	simple/	NetApp simple kfabric/IB test.
 
