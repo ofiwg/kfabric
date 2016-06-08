@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2014 Intel Corporation. All rights reserved.
+ * Copyright (c) 2013-2016 Intel Corporation. All rights reserved.
  *
  * This software is available to you under a choice of one of two
  * licenses.  You may choose to be licensed under the terms of the GNU
@@ -30,71 +30,71 @@
  * SOFTWARE.
  */
 
-#ifndef _FI_CM_H_
-#define _FI_CM_H_
+#ifndef _KFI_CM_H_
+#define _KFI_CM_H_
 
-#include <net/kfi/fi_endpoint.h>
+#include <kfi_endpoint.h>
 
-struct fi_ops_cm {
+struct kfi_ops_cm {
 	size_t	size;
-	int	(*getname)(struct fid *fid, void *addr, size_t *addrlen);
-	int	(*getpeer)(struct fid_ep *ep, void *addr, size_t *addrlen);
-	int	(*connect)(struct fid_ep *ep, const void *addr,
+	int	(*getname)(struct kfid *kfid, void *addr, size_t *addrlen);
+	int	(*getpeer)(struct kfid_ep *ep, void *addr, size_t *addrlen);
+	int	(*connect)(struct kfid_ep *ep, const void *addr,
 			const void *param, size_t paramlen);
-	int	(*listen)(struct fid_pep *pep);
-	int	(*accept)(struct fid_ep *ep, const void *param,
+	int	(*listen)(struct kfid_pep *pep);
+	int	(*accept)(struct kfid_ep *ep, const void *param,
 			size_t paramlen);
-	int	(*reject)(struct fid_pep *pep, fi_connreq_t connreq,
+	int	(*reject)(struct kfid_pep *pep, kfi_connreq_t connreq,
 			const void *param, size_t paramlen);
-	int	(*shutdown)(struct fid_ep *ep, uint64_t flags);
+	int	(*shutdown)(struct kfid_ep *ep, uint64_t flags);
 };
 
 
-#ifndef FABRIC_DIRECT
+#ifndef KFABRIC_DIRECT
 
-static inline int fi_getname(struct fid *fid, void *addr, size_t *addrlen)
+static inline int kfi_getname(struct kfid *kfid, void *addr, size_t *addrlen)
 {
-	struct fid_ep *ep = container_of(fid, struct fid_ep, fid);
-	return ep->cm->getname(fid, addr, addrlen);
+	struct kfid_ep *ep = container_of(kfid, struct kfid_ep, kfid);
+	return ep->cm->getname(kfid, addr, addrlen);
 }
 
-static inline int fi_getpeer(struct fid_ep *ep, void *addr, size_t *addrlen)
+static inline int kfi_getpeer(struct kfid_ep *ep, void *addr, size_t *addrlen)
 {
 	return ep->cm->getpeer(ep, addr, addrlen);
 }
 
-static inline int fi_listen(struct fid_pep *pep)
+static inline int kfi_listen(struct kfid_pep *pep)
 {
 	return pep->cm->listen(pep);
 }
 
 static inline int
-fi_connect(struct fid_ep *ep, const void *addr,
+kfi_connect(struct kfid_ep *ep, const void *addr,
 	   const void *param, size_t paramlen)
 {
 	return ep->cm->connect(ep, addr, param, paramlen);
 }
 
 static inline int
-fi_accept(struct fid_ep *ep, const void *param, size_t paramlen)
+kfi_accept(struct kfid_ep *ep, const void *param, size_t paramlen)
 {
 	return ep->cm->accept(ep, param, paramlen);
 }
 
 static inline int
-fi_reject(struct fid_pep *pep, fi_connreq_t connreq,
+kfi_reject(struct kfid_pep *pep, kfi_connreq_t connreq,
 	  const void *param, size_t paramlen)
 {
 	return pep->cm->reject(pep, connreq, param, paramlen);
 }
 
-static inline int fi_shutdown(struct fid_ep *ep, uint64_t flags)
+static inline int kfi_shutdown(struct kfid_ep *ep, uint64_t flags)
 {
 	return ep->cm->shutdown(ep, flags);
 }
 
-#else /* FABRIC_DIRECT */
-#include <net/kfi/fi_direct_cm.h>
+#else /* KFABRIC_DIRECT */
+#include <kfi_direct_cm.h>
 #endif
 
-#endif /* _FI_CM_H_ */
+#endif /* _KFI_CM_H_ */

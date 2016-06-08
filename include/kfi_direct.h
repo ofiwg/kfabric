@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2015 Intel Corporation. All rights reserved.
+ * Copyright (c) 2016 Intel Corporation. All rights reserved.
  *
  * This software is available to you under a choice of one of two
  * licenses.  You may choose to be licensed under the terms of the GNU
  * General Public License (GPL) Version 2, available from the file
  * COPYING in the main directory of this source tree, or the
- * BSD license below:
+ * OpenFabrics.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
  *     without modification, are permitted provided that the following
@@ -30,29 +30,21 @@
  * SOFTWARE.
  */
 
-#ifndef _KFI_INTERNAL_H_
-#define _KFI_INTERNAL_H_
+/* TODO: revisit these values, these are just placeholders now */
 
-#include <linux/kernel.h>
-#include <linux/byteorder/generic.h>
-#include <linux/list.h>
-#include <linux/mutex.h>
-#include <linux/string.h>
 
-#include <net/kfi/kfi.h>
+#ifndef _KFI_FXR_DIRECT_H_
+#define _KFI_FXR_DIRECT_H_
 
-#define DRV_NAME "kfi"
-#define DRV_PFX "[" DRV_NAME "] "
-
-extern struct list_head kfi_providers;
-extern struct mutex kfi_provider_list_mutex;
-extern int num_kfi_providers;
-
-struct kfi_prov {
-	struct list_head	plist;
-	struct kfi_provider	*provider;
+enum kfi_fxr_static_limits {
+	KFI_FXR_MAX_MSG_SIZE		= (1ULL<<30),
+	KFI_FXR_INJECT_SIZE		= (1ULL<<3),
+	KFI_FXR_TOTAL_BUFFERED_RECV	= (1ULL<<30),
+	KFI_FXR_MAX_ORDER_RAW_SIZE	= (1ULL<<13),
+	KFI_FXR_MAX_ORDER_WAR_SIZE	= (1ULL<<13),
+	KFI_FXR_MAX_ORDER_WAW_SIZE	= (1ULL<<13),
+	KFI_FXR_MR_KEY_SIZE		= (1ULL<<3),
+	KFI_FXR_CQ_DATA_SIZE		= (1ULL<<3)
 };
 
-void fi_freeinfo_internal(struct fi_info *info);
-
-#endif /* _KFI_INTERNAL_H_ */
+#endif /* _KFI_FXR_DIRECT_H_ */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Intel Corporation. All rights reserved.
+ * Copyright (c) 2016 Intel Corporation. All rights reserved.
  *
  * This software is available to you under a choice of one of two
  * licenses.  You may choose to be licensed under the terms of the GNU
@@ -30,28 +30,34 @@
  * SOFTWARE.
  */
 
-#ifndef _KFI_PROVIDER_H_
-#define _KFI_PROVIDER_H_
+#ifndef _KFI_TRIGGER_H_
+#define _KFI_TRIGGER_H_
 
-#include <net/kfi/fabric.h>
+#include <kfabric.h>
 
-#include <net/kfi/kfi.h>
-
-struct kfi_provider {
-	const char *name;
-	uint32_t version;
-	int	(*getinfo)(uint32_t version, struct fi_info *hints,
-			struct fi_info **info);
-	int	(*freeinfo)(struct fi_info *info);
-	int	(*fabric)(struct fi_fabric_attr *attr,
-			struct fid_fabric **fabric, void *context);
+enum fi_trigger_event {
+	FI_TRIGGER_THRESHOLD,
 };
 
+struct fi_trigger_threshold {
+	struct fid_cntr		*cntr;
+	size_t			threshold;
+};
 
-int kfi_register_provider(uint32_t version, struct kfi_provider *provider);
-int kfi_deregister_provider(struct kfi_provider *provider);
+#ifndef KFABRIC_DIRECT
 
-struct fi_info *fi_allocinfo(void);
-void fi_freeinfo(struct fi_info *info);
+/* Size must match struct fi_context */
+struct fi_triggered_context {
+	enum fi_trigger_event	event_type;
+	union {
+		struct fi_trigger_threshold	threshold;
+		void				*internal[3];
+	} trigger;
+};
 
-#endif /* _KFI_PROVIDER_H_ */
+#else /* KFABRIC_DIRECT */
+#include <kfi_direct_trigger.h>
+#endif
+
+
+#endif /* _KFI_TRIGGER_H_ */
