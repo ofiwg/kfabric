@@ -132,12 +132,12 @@ typedef struct kfid *kfid_t;
 #define KFI_MR_DMA_ADDR		(1ULL << 52)  /* mr_reg/v() DMA addrs */
 #define KFI_CQ_CAN_WAIT		(1ULL << 53)  /* kfi_cq_sread() can wait */
 /* kfi_getinfo()-specific flags/caps */
-#define KKFI_PROV_ATTR_ONLY	(1ULL << 54)
-#define KKFI_NUMERICHOST	(1ULL << 55)
-#define KKFI_RMA_EVENT		(1ULL << 56)
-#define KKFI_SOURCE		(1ULL << 57)
-#define KKFI_NAMED_RX_CTX	(1ULL << 58)
-#define KKFI_DIRECTED_RECV	(1ULL << 59)
+#define KFI_PROV_ATTR_ONLY	(1ULL << 54)
+#define KFI_NUMERICHOST		(1ULL << 55)
+#define KFI_RMA_EVENT		(1ULL << 56)
+#define KFI_SOURCE		(1ULL << 57)
+#define KFI_NAMED_RX_CTX	(1ULL << 58)
+#define KFI_DIRECTED_RECV	(1ULL << 59)
 
 /*
  * Format for transport addresses: sendto, writeto, etc.
