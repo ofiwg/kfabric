@@ -34,14 +34,14 @@
 #define _KFI_TAGGED_H_
 
 #include <kfabric.h>
-#include <kfi_fi_endpoint.h>
+#include <kfi_endpoint.h>
 
 
 #define KFI_CLAIM		(1ULL << 0)
 #define KFI_DISCARD		KFI_CANCEL
 
 struct kfi_msg_tagged {
-	const struct iovec	*msg_iov;
+	const struct kvec	*msg_iov;
 	void			**desc;
 	size_t			iov_count;
 	kfi_addr_t		addr;
@@ -56,7 +56,7 @@ struct kfi_ops_tagged {
 	ssize_t (*recv)(struct kfid_ep *ep, void *buf, size_t len, void *desc,
 			kfi_addr_t src_addr,
 			uint64_t tag, uint64_t ignore, void *context);
-	ssize_t (*recvv)(struct kfid_ep *ep, const struct iovec *iov,
+	ssize_t (*recvv)(struct kfid_ep *ep, const struct kvec *iov,
 			void **desc, size_t count, kfi_addr_t src_addr,
 			uint64_t tag, uint64_t ignore, void *context);
 	ssize_t (*recvmsg)(struct kfid_ep *ep, const struct kfi_msg_tagged *msg,
@@ -64,7 +64,7 @@ struct kfi_ops_tagged {
 	ssize_t (*send)(struct kfid_ep *ep, const void *buf, size_t len,
 			void *desc, kfi_addr_t dest_addr, uint64_t tag,
 			void *context);
-	ssize_t (*sendv)(struct kfid_ep *ep, const struct iovec *iov,
+	ssize_t (*sendv)(struct kfid_ep *ep, const struct kvec *iov,
 			void **desc, size_t count, kfi_addr_t dest_addr,
 			uint64_t tag, void *context);
 	ssize_t (*sendmsg)(struct kfid_ep *ep, const struct kfi_msg_tagged *msg,
@@ -93,7 +93,7 @@ kfi_trecv(struct kfid_ep *ep, void *buf, size_t len, void *desc,
 }
 
 static inline ssize_t
-kfi_trecvv(struct kfid_ep *ep, const struct iovec *iov, void **desc,
+kfi_trecvv(struct kfid_ep *ep, const struct kvec *iov, void **desc,
 	   size_t count, kfi_addr_t src_addr, uint64_t tag, uint64_t ignore,
 	   void *context)
 {
@@ -116,7 +116,7 @@ kfi_tsend(struct kfid_ep *ep, const void *buf, size_t len, void *desc,
 }
 
 static inline ssize_t
-kfi_tsendv(struct kfid_ep *ep, const struct iovec *iov, void **desc,
+kfi_tsendv(struct kfid_ep *ep, const struct kvec *iov, void **desc,
 	   size_t count, kfi_addr_t dest_addr, uint64_t tag, void *context)
 {
 	return ep->tagged->sendv(ep, iov, desc, count, dest_addr, tag, context);

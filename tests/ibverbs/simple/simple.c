@@ -43,7 +43,6 @@
 #include <kfi_eq.h>
 #include <kfi_endpoint.h>
 #include <kfi_cm.h>
-#include <kfi_msg.h>
 #include <kfi_rma.h>
 #include <kfi_atomic.h>
 #include <kfi_tagged.h>
@@ -886,7 +885,8 @@ setup_ctx(struct ep_ctx *ctx, struct kfi_info *fi)
 	}
 
 	if (( ret = kfi_mr_reg(ctx->dom, ctx->buf, ctx->buflen,
-	                       KFI_REMOTE_READ | KFI_REMOTE_WRITE | KFI_READ | KFI_WRITE,
+	                       KFI_REMOTE_READ | KFI_REMOTE_WRITE |
+			       KFI_READ | KFI_WRITE,
 	                       0, 0, 0, &ctx->mr, NULL, &ctx->buf_dma) )) {
 		LOG_ERR("Failed to register memory.");
 		goto err;

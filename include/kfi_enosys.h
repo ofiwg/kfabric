@@ -1,5 +1,6 @@
 /*
- * Copyright (c); 2014 Intel Corporation. All rights reserved.
+ * Copyright (c) 2014 Intel Corporation. All rights reserved.
+ * Copyright (c) 2015 NetApp, Inc.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
  * licenses.  You may choose to be licensed under the terms of the GNU
@@ -30,237 +31,679 @@
  * SOFTWARE.
  */
 
-#ifndef _FI_ENOSYS_H_
-#define _FI_ENOSYS_H_
+#ifndef _KFI_ENOSYS_H_
+#define _KFI_ENOSYS_H_
 
-#include <net/kfi/fabric.h>
-#include <net/kfi/fi_atomic.h>
-#include <net/kfi/fi_cm.h>
-#include <net/kfi/fi_domain.h>
-#include <net/kfi/fi_endpoint.h>
-#include <net/kfi/fi_eq.h>
-#include <net/kfi/fi_rma.h>
-#include <net/kfi/fi_tagged.h>
+#include <kfabric.h>
+#include <kfi_domain.h>
+#include <kfi_prov.h>
 
-int fi_no_bind(struct fid *fid, struct fid *bfid, uint64_t flags);
-int fi_no_control(struct fid *fid, int command, void *arg);
-int fi_no_ops_open(struct fid *fid, const char *name,
-		uint64_t flags, void **ops, void *context);
-
-int fi_no_domain(struct fid_fabric *fabric, struct fi_domain_attr *attr,
-		struct fid_domain **dom, void *context);
-int fi_no_passive_ep(struct fid_fabric *fabric, struct fi_info *info,
-		struct fid_pep **pep, void *context);
-int fi_no_eq_open(struct fid_fabric *fabric, struct fi_eq_attr *attr,
-		struct fid_eq **eq, void *context);
-int fi_no_wait_open(struct fid_fabric *fabric, struct fi_wait_attr *attr,
-		struct fid_wait **waitset);
-
-ssize_t fi_no_atomic_write(struct fid_ep *ep,
-		const void *buf, size_t count, void *desc,
-		fi_addr_t dest_addr, uint64_t addr, uint64_t key,
-		enum fi_datatype datatype, enum fi_op op, void *context);
-ssize_t fi_no_atomic_writev(struct fid_ep *ep,
-		const struct fi_ioc *iov, void **desc, size_t count,
-		fi_addr_t dest_addr, uint64_t addr, uint64_t key,
-		enum fi_datatype datatype, enum fi_op op, void *context);
-ssize_t fi_no_atomic_writemsg(struct fid_ep *ep,
-		const struct fi_msg_atomic *msg, uint64_t flags);
-ssize_t fi_no_atomic_inject(struct fid_ep *ep, const void *buf, size_t count,
-		fi_addr_t dest_addr, uint64_t addr, uint64_t key,
-		enum fi_datatype datatype, enum fi_op op);
-ssize_t fi_no_atomic_readwrite(struct fid_ep *ep,
-		const void *buf, size_t count, void *desc,
-		void *result, void *result_desc,
-		fi_addr_t dest_addr, uint64_t addr, uint64_t key,
-		enum fi_datatype datatype, enum fi_op op, void *context);
-ssize_t fi_no_atomic_readwritev(struct fid_ep *ep,
-		const struct fi_ioc *iov, void **desc, size_t count,
-		struct fi_ioc *resultv, void **result_desc, size_t result_count,
-		fi_addr_t dest_addr, uint64_t addr, uint64_t key,
-		enum fi_datatype datatype, enum fi_op op, void *context);
-ssize_t fi_no_atomic_readwritemsg(struct fid_ep *ep,
-		const struct fi_msg_atomic *msg, struct fi_ioc *resultv,
-		void **result_desc, size_t result_count, uint64_t flags);
-ssize_t fi_no_atomic_compwrite(struct fid_ep *ep,
-		const void *buf, size_t count, void *desc,
-		const void *compare, void *compare_desc,
-		void *result, void *result_desc,
-		fi_addr_t dest_addr, uint64_t addr, uint64_t key,
-		enum fi_datatype datatype, enum fi_op op, void *context);
-ssize_t fi_no_atomic_compwritev(struct fid_ep *ep,
-		const struct fi_ioc *iov, void **desc, size_t count,
-		const struct fi_ioc *comparev, void **compare_desc,
-		size_t compare_count,
-		struct fi_ioc *resultv, void **result_desc, size_t result_count,
-		fi_addr_t dest_addr, uint64_t addr, uint64_t key,
-		enum fi_datatype datatype, enum fi_op op, void *context);
-ssize_t fi_no_atomic_compwritemsg(struct fid_ep *ep,
-		const struct fi_msg_atomic *msg,
-		const struct fi_ioc *comparev, void **compare_desc,
-		size_t compare_count, struct fi_ioc *resultv,
-		void **result_desc, size_t result_count, uint64_t flags);
-int fi_no_atomic_writevalid(struct fid_ep *ep,
-		enum fi_datatype datatype, enum fi_op op, size_t *count);
-int fi_no_atomic_readwritevalid(struct fid_ep *ep,
-		enum fi_datatype datatype, enum fi_op op, size_t *count);
-int fi_no_atomic_compwritevalid(struct fid_ep *ep,
-		enum fi_datatype datatype, enum fi_op op, size_t *count);
-
-int fi_no_getname(struct fid *fid, void *addr, size_t *addrlen);
-int fi_no_getpeer(struct fid_ep *ep, void *addr, size_t *addrlen);
-int fi_no_connect(struct fid_ep *ep, const void *addr,
-		const void *param, size_t paramlen);
-int fi_no_listen(struct fid_pep *pep);
-int fi_no_accept(struct fid_ep *ep, const void *param, size_t paramlen);
-int fi_no_reject(struct fid_pep *pep, fi_connreq_t connreq,
-		const void *param, size_t paramlen);
-int fi_no_shutdown(struct fid_ep *ep, uint64_t flags);
-
-int fi_no_av_open(struct fid_domain *domain, struct fi_av_attr *attr,
-		struct fid_av **av, void *context);
-int fi_no_cq_open(struct fid_domain *domain, struct fi_cq_attr *attr,
-		struct fid_cq **cq, void *context);
-int fi_no_endpoint(struct fid_domain *domain, struct fi_info *info,
-		struct fid_ep **ep, void *context);
-int fi_no_cntr_open(struct fid_domain *domain, struct fi_cntr_attr *attr,
-		struct fid_cntr **cntr, void *context);
-int fi_no_poll_open(struct fid_domain *domain, struct fi_poll_attr *attr,
-		struct fid_poll **pollset);
-int fi_no_stx_context(struct fid_domain *domain, struct fi_tx_attr *attr,
-		struct fid_stx **stx, void *context);
-int fi_no_srx_context(struct fid_domain *domain, struct fi_rx_attr *attr,
-		struct fid_ep **rx_ep, void *context);
-
-int fi_no_mr_reg(struct fid *fid, const void *buf, size_t len,
-		uint64_t access, uint64_t offset, uint64_t requested_key,
-		uint64_t flags, struct fid_mr **mr, void *context);
-int fi_no_mr_regv(struct fid *fid, const struct iovec *iov,
-		size_t count, uint64_t access,
-		uint64_t offset, uint64_t requested_key,
-		uint64_t flags, struct fid_mr **mr, void *context);
-int fi_no_mr_regattr(struct fid *fid, const struct fi_mr_attr *attr,
-		uint64_t flags, struct fid_mr **mr);
-
-int fi_no_enable(struct fid_ep *ep);
-ssize_t fi_no_cancel(struct fid *fid, void *context);
-int fi_no_getopt(struct fid *fid, int level, int optname,
-		void *optval, size_t *optlen);
-int fi_no_setopt(struct fid *fid, int level, int optname,
-		const void *optval, size_t optlen);
-int fi_no_tx_ctx(struct fid_ep *sep, int index,
-		struct fi_tx_attr *attr, struct fid_ep **tx_ep,
-		void *context);
-int fi_no_rx_ctx(struct fid_ep *sep, int index,
-		struct fi_rx_attr *attr, struct fid_ep **rx_ep,
-		void *context);
-
-ssize_t fi_no_rx_size_left(struct fid_ep *ep);
-ssize_t fi_no_tx_size_left(struct fid_ep *ep);
-
-ssize_t fi_no_msg_recv(struct fid_ep *ep, void *buf, size_t len, void *desc,
-			fi_addr_t src_addr, void *context);
-ssize_t fi_no_msg_recvv(struct fid_ep *ep, const struct iovec *iov, void **desc,
-			size_t count, fi_addr_t src_addr, void *context);
-ssize_t fi_no_msg_recvmsg(struct fid_ep *ep, const struct fi_msg *msg,
-			uint64_t flags);
-ssize_t fi_no_msg_send(struct fid_ep *ep, const void *buf, size_t len,
-			void *desc, fi_addr_t dest_addr, void *context);
-ssize_t fi_no_msg_sendv(struct fid_ep *ep, const struct iovec *iov, void **desc,
-			size_t count, fi_addr_t dest_addr, void *context);
-ssize_t fi_no_msg_sendmsg(struct fid_ep *ep, const struct fi_msg *msg,
-			uint64_t flags);
-ssize_t fi_no_msg_inject(struct fid_ep *ep, const void *buf, size_t len,
-			fi_addr_t dest_addr);
-ssize_t fi_no_msg_senddata(struct fid_ep *ep, const void *buf, size_t len,
-			   void *desc, uint64_t data, fi_addr_t dest_addr,
-			   void *context);
-ssize_t fi_no_msg_injectdata(struct fid_ep *ep, const void *buf, size_t len,
-			uint64_t data, fi_addr_t dest_addr);
-
-ssize_t fi_no_eq_write(struct fid_eq *eq, uint32_t event,
-			const void *buf, size_t len, uint64_t flags);
-ssize_t fi_no_eq_sread(struct fid_eq *eq, uint32_t *event,
-			void *buf, size_t len, int timeout, uint64_t flags);
-
-ssize_t fi_no_cq_readfrom(struct fid_cq *cq, void *buf, size_t count,
-			fi_addr_t *src_addr);
-ssize_t fi_no_cq_write(struct fid_cq *cq, const void *buf, size_t len);
-ssize_t fi_no_cq_writeerr(struct fid_cq *cq, struct fi_cq_err_entry *buf,
-			size_t len, uint64_t flags);
-ssize_t fi_no_cq_sread(struct fid_cq *cq, void *buf, size_t count,
-			const void *cond, int timeout);
-ssize_t fi_no_cq_sreadfrom(struct fid_cq *cq, void *buf, size_t count,
-			fi_addr_t *src_addr, const void *cond, int timeout);
-
-int fi_no_cntr_add(struct fid_cntr *cntr, uint64_t value);
-int fi_no_cntr_set(struct fid_cntr *cntr, uint64_t value);
-int fi_no_cntr_wait(struct fid_cntr *cntr, uint64_t threshold, int timeout);
-
-ssize_t fi_no_rma_read(struct fid_ep *ep, void *buf, size_t len, void *desc,
-			fi_addr_t src_addr, uint64_t addr, uint64_t key,
-			void *context);
-ssize_t fi_no_rma_readv(struct fid_ep *ep, const struct iovec *iov, void **desc,
-			size_t count, fi_addr_t src_addr, uint64_t addr,
-			uint64_t key, void *context);
-ssize_t fi_no_rma_readmsg(struct fid_ep *ep, const struct fi_msg_rma *msg,
-			uint64_t flags);
-ssize_t fi_no_rma_write(struct fid_ep *ep, const void *buf, size_t len,
-			void *desc, fi_addr_t dest_addr, uint64_t addr,
-			uint64_t key, void *context);
-ssize_t fi_no_rma_writev(struct fid_ep *ep, const struct iovec *iov,
-			void **desc, size_t count, fi_addr_t dest_addr,
-			uint64_t addr, uint64_t key, void *context);
-ssize_t fi_no_rma_writemsg(struct fid_ep *ep, const struct fi_msg_rma *msg,
-			uint64_t flags);
-ssize_t fi_no_rma_inject(struct fid_ep *ep, const void *buf, size_t len,
-			fi_addr_t dest_addr, uint64_t addr, uint64_t key);
-ssize_t fi_no_rma_writedata(struct fid_ep *ep, const void *buf, size_t len,
-			void *desc, uint64_t data, fi_addr_t dest_addr,
-			uint64_t addr, uint64_t key, void *context);
-ssize_t fi_no_rma_injectdata(struct fid_ep *ep, const void *buf, size_t len,
-			uint64_t data, fi_addr_t dest_addr, uint64_t addr,
-			uint64_t key);
-ssize_t fi_no_tagged_recv(struct fid_ep *ep, void *buf, size_t len, void *desc,
-			  fi_addr_t src_addr, uint64_t tag, uint64_t ignore,
-			  void *context);
-ssize_t fi_no_tagged_recvv(struct fid_ep *ep, const struct iovec *iov,
-			   void **desc, size_t count, fi_addr_t src_addr,
-			   uint64_t tag, uint64_t ignore, void *context);
-ssize_t fi_no_tagged_recvmsg(struct fid_ep *ep,
-			     const struct fi_msg_tagged *msg, uint64_t flags);
-ssize_t fi_no_tagged_send(struct fid_ep *ep, const void *buf, size_t len,
-			  void *desc, fi_addr_t dest_addr, uint64_t tag,
-			  void *context);
-ssize_t fi_no_tagged_sendv(struct fid_ep *ep, const struct iovec *iov,
-			   void **desc, size_t count, fi_addr_t dest_addr,
-			   uint64_t tag, void *context);
-ssize_t fi_no_tagged_sendmsg(struct fid_ep *ep, const struct fi_msg_tagged *msg,
-			     uint64_t flags);
-ssize_t fi_no_tagged_inject(struct fid_ep *ep, const void *buf, size_t len,
-			    fi_addr_t dest_addr, uint64_t tag);
-ssize_t fi_no_tagged_senddata(struct fid_ep *ep, const void *buf, size_t len,
-			      void *desc, uint64_t data, fi_addr_t dest_addr,
-			      uint64_t tag, void *context);
-ssize_t fi_no_tagged_injectdata(struct fid_ep *ep, const void *buf, size_t len,
-				uint64_t data, fi_addr_t dest_addr,
-				uint64_t tag);
-ssize_t fi_no_tagged_search(struct fid_ep *ep, uint64_t *tag, uint64_t ignore,
-			    uint64_t flags, fi_addr_t *src_addr, size_t *len,
-			    void *context);
 
 /*
- * fi_ops_av
- */
-int fi_no_av_insert(struct fid_av *av, const void *addr, size_t count,
-			fi_addr_t *fi_addr, uint64_t flags, void *context);
-int fi_no_av_insertsvc(struct fid_av *av, const char *node,
-			const char *service, fi_addr_t *fi_addr, uint64_t flags,
-			void *context);
-int fi_no_av_insertsym(struct fid_av *av, const char *node, size_t nodecnt,
-			const char *service, size_t svccnt, fi_addr_t *fi_addr,
-			uint64_t flags, void *context);
-int fi_no_av_remove(struct fid_av *av, fi_addr_t *fi_addr, size_t count,
-			uint64_t flags);
+static struct kfi_ops X = {
+	.close = X,
+	.bind = kfi_no_bind,
+	.control = kfi_no_control,
+	.ops_open = kfi_no_ops_open,
+};
+*/
 
-#endif /* _FI_ENOSYS_H_ */
+static inline int
+kfi_no_bind(struct kfid *fid, struct kfid *bfid, uint64_t flags)
+{
+	return -ENOSYS;
+};
+
+static inline int
+kfi_no_control(struct kfid *fid, int command, void *arg)
+{
+	return -ENOSYS;
+};
+
+static inline int
+kfi_no_ops_open(struct kfid *fid, const char *name, uint64_t flags, void **ops,
+                void *context)
+{
+	return -ENOSYS;
+};
+
+
+/*
+static struct kfi_ops_fabric X = {
+	.domain = kfi_no_domain,
+	.passive_ep = kfi_no_passive_ep,
+	.eq_open = kfi_no_eq_open,
+};
+*/
+
+static inline int
+kfi_no_domain(struct kfid_fabric *fabric, struct kfi_domain_attr *attr,
+                struct kfid_domain **dom, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline int
+kfi_no_passive_ep(struct kfid_fabric *fabric, struct kfi_info *info,
+                struct kfid_pep **pep, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline int
+kfi_no_eq_open(struct kfid_fabric *fabric, struct kfi_eq_attr *attr,
+                struct kfid_eq **eq, void *context)
+{
+	return -ENOSYS;
+};
+
+
+/*
+static struct kfi_ops_atomic X = {
+	.write = kfi_no_atomic_write,
+	.writev = kfi_no_atomic_writev,
+	.writemsg = kfi_no_atomic_writemsg,
+	.inject = kfi_no_atomic_inject,
+	.readwrite = kfi_no_atomic_readwrite,
+	.readwritev = kfi_no_atomic_readwritev,
+	.readwritemsg = kfi_no_atomic_readwritemsg,
+	.compwrite = kfi_no_atomic_compwrite,
+	.compwritev = kfi_no_atomic_compwritev,
+	.compwritemsg = kfi_no_atomic_compwritemsg,
+	.writevalid = kfi_no_atomic_writevalid,
+	.readwritevalid = kfi_no_atomic_readwritevalid,
+	.compwritevalid = kfi_no_atomic_compwritevalid,
+};
+*/
+
+static inline ssize_t
+kfi_no_atomic_write(struct kfid_ep *ep, const void *buf, size_t count,
+                void *desc, kfi_addr_t dest_addr, uint64_t addr, uint64_t key,
+                enum kfi_datatype datatype, enum kfi_op op, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_atomic_writev(struct kfid_ep *ep, const struct kfi_ioc *iov, void **desc,
+                size_t count, kfi_addr_t dest_addr, uint64_t addr, uint64_t key,
+                enum kfi_datatype datatype, enum kfi_op op, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_atomic_writemsg(struct kfid_ep *ep, const struct kfi_msg_atomic *msg,
+                uint64_t flags)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_atomic_inject(struct kfid_ep *ep, const void *buf, size_t count,
+                kfi_addr_t dest_addr, uint64_t addr, uint64_t key,
+                enum kfi_datatype datatype, enum kfi_op op)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_atomic_readwrite(struct kfid_ep *ep, const void *buf, size_t count,
+                void *desc, void *result, void *result_desc, kfi_addr_t dest_addr,
+                uint64_t addr, uint64_t key, enum kfi_datatype datatype,
+                enum kfi_op op, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_atomic_readwritev(struct kfid_ep *ep, const struct kfi_ioc *iov,
+                void **desc, size_t count, struct kfi_ioc *resultv,
+                void **result_desc, size_t result_count, kfi_addr_t dest_addr,
+                uint64_t addr, uint64_t key, enum kfi_datatype datatype,
+                enum kfi_op op, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_atomic_readwritemsg(struct kfid_ep *ep, const struct kfi_msg_atomic *msg,
+                struct kfi_ioc *resultv, void **result_desc, size_t result_count,
+                uint64_t flags)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_atomic_compwrite(struct kfid_ep *ep, const void *buf, size_t count,
+                void *desc, const void *compare, void *compare_desc, void *result,
+                void *result_desc, kfi_addr_t dest_addr, uint64_t addr,
+                uint64_t key, enum kfi_datatype datatype, enum kfi_op op,
+                void *context)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_atomic_compwritev(struct kfid_ep *ep, const struct kfi_ioc *iov,
+                void **desc, size_t count, const struct kfi_ioc *comparev,
+                void **compare_desc, size_t compare_count,
+                struct kfi_ioc *resultv, void **result_desc, size_t result_count,
+                kfi_addr_t dest_addr, uint64_t addr, uint64_t key,
+                enum kfi_datatype datatype, enum kfi_op op, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_atomic_compwritemsg(struct kfid_ep *ep, const struct kfi_msg_atomic *msg,
+                const struct kfi_ioc *comparev, void **compare_desc,
+                size_t compare_count, struct kfi_ioc *resultv, void **result_desc,
+                size_t result_count, uint64_t flags)
+{
+	return -ENOSYS;
+};
+
+static inline int
+kfi_no_atomic_writevalid(struct kfid_ep *ep, enum kfi_datatype datatype,
+                enum kfi_op op, size_t *count)
+{
+	return -ENOSYS;
+};
+
+static inline int
+kfi_no_atomic_readwritevalid(struct kfid_ep *ep, enum kfi_datatype datatype,
+                enum kfi_op op, size_t *count)
+{
+	return -ENOSYS;
+};
+
+static inline int
+kfi_no_atomic_compwritevalid(struct kfid_ep *ep, enum kfi_datatype datatype,
+                enum kfi_op op, size_t *count)
+{
+	return -ENOSYS;
+};
+
+
+/*
+static struct kfi_ops_cm X = {
+	.setname = kfi_no_setname,
+	.getname = kfi_no_getname,
+	.getpeer = kfi_no_getpeer,
+	.connect = kfi_no_connect,
+	.listen = kfi_no_listen,
+	.accept = kfi_no_accept,
+	.reject = kfi_no_reject,
+	.shutdown = kfi_no_shutdown,
+};
+*/
+
+static inline int
+kfi_no_setname(kfid_t fid, void *addr, size_t addrlen)
+{
+	return -ENOSYS;
+};
+
+static inline int
+kfi_no_getname(kfid_t fid, void *addr, size_t *addrlen)
+{
+	return -ENOSYS;
+};
+
+static inline int
+kfi_no_getpeer(struct kfid_ep *ep, void *addr, size_t *addrlen)
+{
+	return -ENOSYS;
+};
+
+static inline int
+kfi_no_connect(struct kfid_ep *ep, const void *addr, const void *param,
+                size_t paramlen)
+{
+	return -ENOSYS;
+};
+
+static inline int
+kfi_no_listen(struct kfid_pep *pep)
+{
+	return -ENOSYS;
+};
+
+static inline int
+kfi_no_accept(struct kfid_ep *ep, const void *param, size_t paramlen)
+{
+	return -ENOSYS;
+};
+
+static inline int
+kfi_no_reject(struct kfid_pep *pep, kfid_t handle, const void *param,
+                size_t paramlen)
+{
+	return -ENOSYS;
+};
+
+static inline int
+kfi_no_shutdown(struct kfid_ep *ep, uint64_t flags)
+{
+	return -ENOSYS;
+};
+
+
+/*
+static struct kfi_ops_domain X = {
+	.cq_open = kfi_no_cq_open,
+	.endpoint = kfi_no_endpoint,
+};
+*/
+
+static inline int
+kfi_no_cq_open(struct kfid_domain *domain, struct kfi_cq_attr *attr,
+                struct kfid_cq **cq, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline int
+kfi_no_endpoint(struct kfid_domain *domain, struct kfi_info *info,
+                struct kfid_ep **ep, void *context)
+{
+	return -ENOSYS;
+};
+
+
+/*
+static struct kfi_ops_mr X = {
+	.reg = kfi_no_mr_reg,
+	.regv = kfi_no_mr_regv,
+	.regattr = kfi_no_mr_regattr,
+};
+*/
+
+static inline int
+kfi_no_mr_reg(struct kfid *fid, const void *buf, size_t len, uint64_t access,
+                uint64_t offset, uint64_t requested_key, uint64_t flags,
+                struct kfid_mr **mr, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline int
+kfi_no_mr_regv(struct kfid *fid, const struct kvec *iov, size_t count,
+                uint64_t access, uint64_t offset, uint64_t requested_key,
+                uint64_t flags, struct kfid_mr **mr, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline int
+kfi_no_mr_regattr(struct kfid *fid, const struct kfi_mr_attr *attr,
+                uint64_t flags, struct kfid_mr **mr)
+{
+	return -ENOSYS;
+};
+
+
+/*
+static struct kfi_ops_ep X = {
+	.cancel = kfi_no_cancel,
+	.getopt = kfi_no_getopt,
+	.setopt = kfi_no_setopt,
+	.tx_ctx = kfi_no_tx_ctx,
+	.rx_ctx = kfi_no_rx_ctx,
+	.rx_size_left = kfi_no_rx_size_left,
+	.tx_size_left = kfi_no_tx_size_left,
+};
+*/
+
+static inline ssize_t
+kfi_no_cancel(kfid_t fid, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline int
+kfi_no_getopt(kfid_t fid, int level, int optname, void *optval, size_t *optlen)
+{
+	return -ENOSYS;
+};
+
+static inline int
+kfi_no_setopt(kfid_t fid, int level, int optname, const void *optval,
+                size_t optlen)
+{
+	return -ENOSYS;
+};
+
+static inline int
+kfi_no_tx_ctx(struct kfid_ep *sep, int index, struct kfi_tx_attr *attr,
+                struct kfid_ep **tx_ep, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline int
+kfi_no_rx_ctx(struct kfid_ep *sep, int index, struct kfi_rx_attr *attr,
+                struct kfid_ep **rx_ep, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_rx_size_left(struct kfid_ep *ep)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_tx_size_left(struct kfid_ep *ep)
+{
+	return -ENOSYS;
+};
+
+
+/*
+static struct kfi_ops_msg X = {
+	.recv = kfi_no_msg_recv,
+	.recvv = kfi_no_msg_recvv,
+	.recvmsg = kfi_no_msg_recvmsg,
+	.send = kfi_no_msg_send,
+	.sendv = kfi_no_msg_sendv,
+	.sendmsg = kfi_no_msg_sendmsg,
+	.inject = kfi_no_msg_inject,
+	.senddata = kfi_no_msg_senddata,
+	.injectdata = kfi_no_msg_injectdata,
+};
+*/
+
+static inline ssize_t
+kfi_no_msg_recv(struct kfid_ep *ep, void *buf, size_t len, void *desc,
+                kfi_addr_t src_addr, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_msg_recvv(struct kfid_ep *ep, const struct kvec *iov, void **desc,
+                size_t count, kfi_addr_t src_addr, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_msg_recvmsg(struct kfid_ep *ep, const struct kfi_msg *msg, uint64_t flags)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_msg_send(struct kfid_ep *ep, const void *buf, size_t len, void *desc,
+                kfi_addr_t dest_addr, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_msg_sendv(struct kfid_ep *ep, const struct kvec *iov, void **desc,
+                size_t count, kfi_addr_t dest_addr, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_msg_sendmsg(struct kfid_ep *ep, const struct kfi_msg *msg, uint64_t flags)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_msg_inject(struct kfid_ep *ep, const void *buf, size_t len,
+                kfi_addr_t dest_addr)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_msg_senddata(struct kfid_ep *ep, const void *buf, size_t len, void *desc,
+                uint64_t data, kfi_addr_t dest_addr, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_msg_injectdata(struct kfid_ep *ep, const void *buf, size_t len,
+                uint64_t data, kfi_addr_t dest_addr)
+{
+	return -ENOSYS;
+};
+
+
+/*
+static struct kfi_ops_eq X = {
+	.read = X,
+	.readerr = X,
+	.write = kfi_no_eq_write,
+	.sread = kfi_no_eq_sread,
+	.strerror = X,
+};
+*/
+
+static inline ssize_t
+kfi_no_eq_write(struct kfid_eq *eq, uint32_t event, const void *buf, size_t len,
+                uint64_t flags)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_eq_sread(struct kfid_eq *eq, uint32_t *event, void *buf, size_t len,
+                int timeout, uint64_t flags)
+{
+	return -ENOSYS;
+};
+
+
+/*
+static struct kfi_ops_cq X = {
+	.read = X,
+	.readfrom = kfi_no_cq_readfrom,
+	.readerr = X,
+	.sread = kfi_no_cq_sread,
+	.sreadfrom = kfi_no_cq_sreadfrom,
+	.signal = kfi_no_cq_signal,
+	.strerror = X,
+};
+*/
+
+static inline ssize_t
+kfi_no_cq_readfrom(struct kfid_cq *cq, void *buf, size_t count,
+                kfi_addr_t *src_addr)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_cq_sread(struct kfid_cq *cq, void *buf, size_t count, const void *cond,
+                int timeout)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_cq_sreadfrom(struct kfid_cq *cq, void *buf, size_t count,
+                kfi_addr_t *src_addr, const void *cond, int timeout)
+{
+	return -ENOSYS;
+};
+
+static inline int
+kfi_no_cq_signal(struct kfid_cq *cq)
+{
+	return -ENOSYS;
+};
+
+
+/*
+static struct kfi_ops_rma X = {
+	.read = kfi_no_rma_read,
+	.readv = kfi_no_rma_readv,
+	.readmsg = kfi_no_rma_readmsg,
+	.write = kfi_no_rma_write,
+	.writev = kfi_no_rma_writev,
+	.writemsg = kfi_no_rma_writemsg,
+	.inject = kfi_no_rma_inject,
+	.writedata = kfi_no_rma_writedata,
+	.injectdata = kfi_no_rma_injectdata,
+};
+*/
+
+static inline ssize_t
+kfi_no_rma_read(struct kfid_ep *ep, void *buf, size_t len, void *desc,
+                kfi_addr_t src_addr, uint64_t addr, uint64_t key, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_rma_readv(struct kfid_ep *ep, const struct kvec *iov, void **desc,
+                size_t count, kfi_addr_t src_addr, uint64_t addr, uint64_t key,
+                void *context)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_rma_readmsg(struct kfid_ep *ep, const struct kfi_msg_rma *msg,
+                uint64_t flags)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_rma_write(struct kfid_ep *ep, const void *buf, size_t len, void *desc,
+                kfi_addr_t dest_addr, uint64_t addr, uint64_t key, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_rma_writev(struct kfid_ep *ep, const struct kvec *iov, void **desc,
+                size_t count, kfi_addr_t dest_addr, uint64_t addr, uint64_t key,
+                void *context)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_rma_writemsg(struct kfid_ep *ep, const struct kfi_msg_rma *msg,
+                uint64_t flags)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_rma_inject(struct kfid_ep *ep, const void *buf, size_t len,
+                kfi_addr_t dest_addr, uint64_t addr, uint64_t key)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_rma_writedata(struct kfid_ep *ep, const void *buf, size_t len, void *desc,
+                uint64_t data, kfi_addr_t dest_addr, uint64_t addr, uint64_t key,
+                void *context)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_rma_injectdata(struct kfid_ep *ep, const void *buf, size_t len,
+                uint64_t data, kfi_addr_t dest_addr, uint64_t addr, uint64_t key)
+{
+	return -ENOSYS;
+};
+
+
+/*
+static struct kfi_ops_tagged X = {
+	.recv = kfi_no_tagged_recv,
+	.recvv = kfi_no_tagged_recvv,
+	.recvmsg = kfi_no_tagged_recvmsg,
+	.send = kfi_no_tagged_send,
+	.sendv = kfi_no_tagged_sendv,
+	.sendmsg = kfi_no_tagged_sendmsg,
+	.inject = kfi_no_tagged_inject,
+	.senddata = kfi_no_tagged_senddata,
+	.injectdata = kfi_no_tagged_injectdata,
+};
+*/
+
+static inline ssize_t
+kfi_no_tagged_recv(struct kfid_ep *ep, void *buf, size_t len, void *desc,
+                        kfi_addr_t src_addr, uint64_t tag, uint64_t ignore,
+                        void *context)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_tagged_recvv(struct kfid_ep *ep, const struct kvec *iov, void **desc,
+                        size_t count, kfi_addr_t src_addr, uint64_t tag,
+                        uint64_t ignore, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_tagged_recvmsg(struct kfid_ep *ep, const struct kfi_msg_tagged *msg,
+                        uint64_t flags)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_tagged_send(struct kfid_ep *ep, const void *buf, size_t len, void *desc,
+                        kfi_addr_t dest_addr, uint64_t tag, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_tagged_sendv(struct kfid_ep *ep, const struct kvec *iov, void **desc,
+                        size_t count, kfi_addr_t dest_addr, uint64_t tag,
+                        void *context)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_tagged_sendmsg(struct kfid_ep *ep, const struct kfi_msg_tagged *msg,
+                        uint64_t flags)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_tagged_inject(struct kfid_ep *ep, const void *buf, size_t len,
+                        kfi_addr_t dest_addr, uint64_t tag)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_tagged_senddata(struct kfid_ep *ep, const void *buf, size_t len,
+                        void *desc, uint64_t data, kfi_addr_t dest_addr,
+                        uint64_t tag, void *context)
+{
+	return -ENOSYS;
+};
+
+static inline ssize_t
+kfi_no_tagged_injectdata(struct kfid_ep *ep, const void *buf, size_t len,
+                        uint64_t data, kfi_addr_t dest_addr, uint64_t tag)
+{
+	return -ENOSYS;
+};
+
+
+#endif /* _KFI_ENOSYS_H_ */

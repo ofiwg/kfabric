@@ -60,7 +60,7 @@ struct kfi_ops_wait {
 };
 
 struct kfid_wait {
-	struct kfid		kfid;
+	struct kfid		fid;
 	struct kfi_ops_wait	*ops;
 };
 
@@ -83,7 +83,7 @@ struct kfi_ops_poll {
 };
 
 struct kfid_poll {
-	struct kfid		kfid;
+	struct kfid		fid;
 	struct kfi_ops_poll	*ops;
 };
 
@@ -112,13 +112,13 @@ enum {
 };
 
 struct kfi_eq_entry {
-	struct kfid		*kfid;
+	struct kfid		*fid;
 	void			*context;
 	uint64_t		data;
 };
 
 struct kfi_eq_err_entry {
-	struct kfid		*kfid;
+	struct kfid		*fid;
 	void			*context;
 	uint64_t		data;
 	int			err;
@@ -128,7 +128,7 @@ struct kfi_eq_err_entry {
 };
 
 struct kfi_eq_cm_entry {
-	struct kfid		*kfid;
+	struct kfid		*fid;
 	/* user must call kfi_freeinfo to release info */
 	struct kfi_info		*info;
 	/* connection data placed here, up to space provided */
@@ -150,7 +150,7 @@ struct kfi_ops_eq {
 };
 
 struct kfid_eq {
-	struct kfid		kfid;
+	struct kfid		fid;
 	struct kfi_ops_eq	*ops;
 };
 
@@ -239,12 +239,13 @@ struct kfi_ops_cq {
 			const void *cond, int timeout);
 	ssize_t	(*sreadfrom)(struct kfid_cq *cq, void *buf, size_t count,
 			kfi_addr_t *src_addr, const void *cond, int timeout);
+	int (*signal)(struct kfid_cq *cq);
 	const char * (*strerror)(struct kfid_cq *cq, int prov_errno,
 			const void *err_data, char *buf, size_t len);
 };
 
 struct kfid_cq {
-	struct kfid		kfid;
+	struct kfid		fid;
 	struct kfi_ops_cq	*ops;
 };
 
@@ -275,7 +276,7 @@ struct kfi_ops_cntr {
 };
 
 struct kfid_cntr {
-	struct kfid		kfid;
+	struct kfid		fid;
 	struct kfi_ops_cntr	*ops;
 };
 

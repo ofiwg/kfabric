@@ -33,13 +33,12 @@
 #ifndef _KFI_ENDPOINT_H_
 #define _KFI_ENDPOINT_H_
 
-#include <linux/socket.h>
-#include <kfi_fabric.h>
+#include <kfabric.h>
 #include <kfi_domain.h>
 
 
 struct kfi_msg {
-	const struct iovec	*msg_iov;
+	const struct kvec	*msg_iov;
 	void			**desc;
 	size_t			iov_count;
 	kfi_addr_t		addr;
@@ -59,10 +58,10 @@ enum {
 
 struct kfi_ops_ep {
 	size_t	size;
-	ssize_t	(*cancel)(struct kfid *kfid, void *context);
-	int	(*getopt)(struct kfid *kfid, int level, int optname,
+	ssize_t	(*cancel)(struct kfid *fid, void *context);
+	int	(*getopt)(struct kfid *fid, int level, int optname,
 			void *optval, size_t *optlen);
-	int	(*setopt)(struct kfid *kfid, int level, int optname,
+	int	(*setopt)(struct kfid *fid, int level, int optname,
 			const void *optval, size_t optlen);
 	int	(*tx_ctx)(struct kfid_ep *sep, int index,
 			struct kfi_tx_attr *attr, struct kfid_ep **tx_ep,
@@ -78,14 +77,14 @@ struct kfi_ops_msg {
 	size_t	size;
 	ssize_t (*recv)(struct kfid_ep *ep, void *buf, size_t len, void *desc,
 			kfi_addr_t src_addr, void *context);
-	ssize_t (*recvv)(struct kfid_ep *ep, const struct iovec *iov,
+	ssize_t (*recvv)(struct kfid_ep *ep, const struct kvec *iov,
 			void **desc, size_t count, kfi_addr_t src_addr,
 			void *context);
 	ssize_t (*recvmsg)(struct kfid_ep *ep, const struct kfi_msg *msg,
 			uint64_t flags);
 	ssize_t (*send)(struct kfid_ep *ep, const void *buf, size_t len,
 			void *desc, kfi_addr_t dest_addr, void *context);
-	ssize_t (*sendv)(struct kfid_ep *ep, const struct iovec *iov,
+	ssize_t (*sendv)(struct kfid_ep *ep, const struct kvec *iov,
 			void **desc, size_t count, kfi_addr_t dest_addr,
 			void *context);
 	ssize_t (*sendmsg)(struct kfid_ep *ep, const struct kfi_msg *msg,
@@ -103,7 +102,6 @@ struct kfi_ops_cm;
 struct kfi_ops_rma;
 struct kfi_ops_tagged;
 struct kfi_ops_atomic;
-/* struct kfi_ops_collectives; */
 
 /*
  * Calls which modify the properties of a endpoint (control, setopt, bind, ...)
@@ -115,7 +113,7 @@ struct kfi_ops_atomic;
  * ops requested by the user.
  */
 struct kfid_ep {
-	struct kfid		kfid;
+	struct kfid		fid;
 	struct kfi_ops_ep	*ops;
 	struct kfi_ops_cm	*cm;
 	struct kfi_ops_msg	*msg;
@@ -125,13 +123,13 @@ struct kfid_ep {
 };
 
 struct kfid_pep {
-	struct kfid		kfid;
+	struct kfid		fid;
 	struct kfi_ops_ep	*ops;
 	struct kfi_ops_cm	*cm;
 };
 
 struct kfid_stx {
-	struct kfid		kfid;
+	struct kfid		fid;
 	struct kfi_ops_ep	*ops;
 };
 
@@ -159,48 +157,48 @@ kfi_scalable_ep(struct kfid_domain *domain, struct kfi_info *info,
 }
 
 static inline int
-kfi_ep_bind(struct kfid_ep *ep, struct kfid *bkfid, uint64_t flags)
+kfi_ep_bind(struct kfid_ep *ep, struct kfid *bfid, uint64_t flags)
 {
-	return ep->kfid.ops->bind(&ep->kfid, bkfid, flags);
+	return ep->fid.ops->bind(&ep->fid, bfid, flags);
 }
 
 static inline int
-kfi_pep_bind(struct kfid_pep *pep, struct kfid *bkfid, uint64_t flags)
+kfi_pep_bind(struct kfid_pep *pep, struct kfid *bfid, uint64_t flags)
 {
-	return pep->kfid.ops->bind(&pep->kfid, bkfid, flags);
+	return pep->fid.ops->bind(&pep->fid, bfid, flags);
 }
 
 static inline
-int kfi_scalable_ep_bind(struct kfid_ep *sep, struct kfid *bkfid, uint64_t flags)
+int kfi_scalable_ep_bind(struct kfid_ep *sep, struct kfid *bfid, uint64_t flags)
 {
-	return sep->kfid.ops->bind(&sep->kfid, bkfid, flags);
+	return sep->fid.ops->bind(&sep->fid, bfid, flags);
 }
 
 static inline int kfi_enable(struct kfid_ep *ep)
 {
-	return ep->kfid.ops->control(&ep->kfid, KFI_ENABLE, NULL);
+	return ep->fid.ops->control(&ep->fid, KFI_ENABLE, NULL);
 }
 
-static inline ssize_t kfi_cancel(struct kfid *kfid, void *context)
+static inline ssize_t kfi_cancel(struct kfid *fid, void *context)
 {
-	struct kfid_ep *ep = container_of(kfid, struct kfid_ep, kfid);
-	return ep->ops->cancel(kfid, context);
+	struct kfid_ep *ep = container_of(fid, struct kfid_ep, fid);
+	return ep->ops->cancel(fid, context);
 }
 
 static inline int
-kfi_setopt(struct kfid *kfid, int level, int optname, const void *optval,
+kfi_setopt(struct kfid *fid, int level, int optname, const void *optval,
 	   size_t optlen)
 {
-	struct kfid_ep *ep = container_of(kfid, struct kfid_ep, kfid);
-	return ep->ops->setopt(kfid, level, optname, optval, optlen);
+	struct kfid_ep *ep = container_of(fid, struct kfid_ep, fid);
+	return ep->ops->setopt(fid, level, optname, optval, optlen);
 }
 
 static inline int
-kfi_getopt(struct kfid *kfid, int level, int optname, void *optval,
+kfi_getopt(struct kfid *fid, int level, int optname, void *optval,
 	   size_t *optlen)
 {
-	struct kfid_ep *ep = container_of(kfid, struct kfid_ep, kfid);
-	return ep->ops->getopt(kfid, level, optname, optval, optlen);
+	struct kfid_ep *ep = container_of(fid, struct kfid_ep, fid);
+	return ep->ops->getopt(fid, level, optname, optval, optlen);
 }
 
 static inline int
@@ -251,7 +249,7 @@ kfi_recv(struct kfid_ep *ep, void *buf, size_t len, void *desc,
 }
 
 static inline ssize_t
-kfi_recvv(struct kfid_ep *ep, const struct iovec *iov, void **desc,
+kfi_recvv(struct kfid_ep *ep, const struct kvec *iov, void **desc,
 	 size_t count, kfi_addr_t src_addr, void *context)
 {
 	return ep->msg->recvv(ep, iov, desc, count, src_addr, context);
@@ -271,7 +269,7 @@ kfi_send(struct kfid_ep *ep, const void *buf, size_t len, void *desc,
 }
 
 static inline ssize_t
-kfi_sendv(struct kfid_ep *ep, const struct iovec *iov, void **desc,
+kfi_sendv(struct kfid_ep *ep, const struct kvec *iov, void **desc,
 	  size_t count, kfi_addr_t dest_addr, void *context)
 {
 	return ep->msg->sendv(ep, iov, desc, count, dest_addr, context);

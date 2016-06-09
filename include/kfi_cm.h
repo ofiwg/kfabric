@@ -37,14 +37,15 @@
 
 struct kfi_ops_cm {
 	size_t	size;
-	int	(*getname)(struct kfid *kfid, void *addr, size_t *addrlen);
+	int	(*setname)(kfid_t fid, void *addr, size_t addrlen);
+	int	(*getname)(struct kfid *fid, void *addr, size_t *addrlen);
 	int	(*getpeer)(struct kfid_ep *ep, void *addr, size_t *addrlen);
 	int	(*connect)(struct kfid_ep *ep, const void *addr,
 			const void *param, size_t paramlen);
 	int	(*listen)(struct kfid_pep *pep);
 	int	(*accept)(struct kfid_ep *ep, const void *param,
 			size_t paramlen);
-	int	(*reject)(struct kfid_pep *pep, kfi_connreq_t connreq,
+	int	(*reject)(struct kfid_pep *pep, kfid_t handle,
 			const void *param, size_t paramlen);
 	int	(*shutdown)(struct kfid_ep *ep, uint64_t flags);
 };
@@ -52,10 +53,10 @@ struct kfi_ops_cm {
 
 #ifndef KFABRIC_DIRECT
 
-static inline int kfi_getname(struct kfid *kfid, void *addr, size_t *addrlen)
+static inline int kfi_getname(struct kfid *fid, void *addr, size_t *addrlen)
 {
-	struct kfid_ep *ep = container_of(kfid, struct kfid_ep, kfid);
-	return ep->cm->getname(kfid, addr, addrlen);
+	struct kfid_ep *ep = container_of(fid, struct kfid_ep, fid);
+	return ep->cm->getname(fid, addr, addrlen);
 }
 
 static inline int kfi_getpeer(struct kfid_ep *ep, void *addr, size_t *addrlen)
@@ -82,7 +83,7 @@ kfi_accept(struct kfid_ep *ep, const void *param, size_t paramlen)
 }
 
 static inline int
-kfi_reject(struct kfid_pep *pep, kfi_connreq_t connreq,
+kfi_reject(struct kfid_pep *pep, kfid_t connreq,
 	  const void *param, size_t paramlen)
 {
 	return pep->cm->reject(pep, connreq, param, paramlen);

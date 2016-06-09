@@ -39,15 +39,13 @@
 #include <linux/delay.h>
 #include <net/sock.h>
 
-#include <net/kfi/fabric.h>
-#include <net/kfi/fi_errno.h>
-#include <net/kfi/fi_endpoint.h>
-#include <net/kfi/fi_domain.h>
-#include <net/kfi/fi_tagged.h>
-#include <net/kfi/fi_cm.h>
-#include <net/kfi/fi_eq.h>
-
-#define DRV_NAME "kfit_verbs_cli"
+#include <kfabric.h>
+#include <kfi_errno.h>
+#include <kfi_endpoint.h>
+#include <kfi_domain.h>
+#include <kfi_tagged.h>
+#include <kfi_cm.h>
+#include <kfi_eq.h>
 
 #include <common.h>
 
@@ -83,39 +81,39 @@ module_param(verify, int, S_IRUSR);
 MODULE_PARM_DESC(verify, " output per message string data");
 
 typedef struct {
-	struct fi_context	context;
-	struct fi_info		*prov;
-	struct fid_fabric	*fabric;
-	struct fid_domain	*domain;
-	struct fid_ep		*ep;
-	struct fid_eq		*eq;
-	struct fid_cq		*scq;
-	struct fid_cq		*rcq;
-	struct fid_mr		*mr;
+	struct kfi_context	context;
+	struct kfi_info		*prov;
+	struct kfid_fabric	*fabric;
+	struct kfid_domain	*domain;
+	struct kfid_ep		*ep;
+	struct kfid_eq		*eq;
+	struct kfid_cq		*scq;
+	struct kfid_cq		*rcq;
+	struct kfid_mr		*mr;
 	char			*buf;
 } simple_context_t;
 
 static simple_context_t		ctx;
 static int			connected;
 
-simple_context_t *fi_to_simple_context(void *ctx)
+simple_context_t *kfi_to_simple_context(void *ctx)
 {
 	return container_of(ctx, simple_context_t, context);
 }
 
-int match_provider(struct fi_info **prov)
+int match_provider(struct kfi_info **prov)
 {
-	struct fi_info		hints = { 0 };
-	struct fi_fabric_attr	attr = { 0 };
+	struct kfi_info		hints = { 0 };
+	struct kfi_fabric_attr	attr = { 0 };
 	struct sockaddr_in	addr = { 0 };
 	int			ret;
 
 	print_trace("in\n");
 
 	/* ibverbs provider */
-	hints.ep_type		= FI_EP_MSG;
-	hints.caps		= FI_MSG | FI_CANCEL;
-	hints.addr_format	= FI_SOCKADDR_IN;
+	hints.ep_type		= KFI_EP_MSG;
+	hints.caps		= KFI_MSG | FI_CANCEL;
+	hints.addr_format	= KFI_SOCKADDR_IN;
 
 	hints.src_addr		= &addr;
 	hints.src_addrlen	= sizeof(addr);
@@ -133,9 +131,9 @@ int match_provider(struct fi_info **prov)
 	hints.fabric_attr	= &attr;
 	hints.fabric_attr->prov_name = kstrdup("ibverbs", GFP_KERNEL);
 
-	ret = fi_getinfo(FI_VERSION(1, 0), &hints, prov);
+	ret = kfi_getinfo(KFI_VERSION(1, 0), &hints, prov);
 	if (ret) {
-		print_err("ERR: fi_getinfo() '%s'\n", fi_strerror(ret));
+		print_err("ERR: kfi_getinfo() '%s'\n", kfi_strerror(ret));
 		return ret;
 	}
 
@@ -151,8 +149,8 @@ int match_provider(struct fi_info **prov)
 
 int client_connect(struct fi_info *prov, simple_context_t *ctx)
 {
-	struct fi_eq_attr	eq_attr = { 0 };
-	struct fi_cq_attr	cq_attr = { 0 };
+	struct kfi_eq_attr	eq_attr = { 0 };
+	struct kfi_cq_attr	cq_attr = { 0 };
 	struct sockaddr_in	addr = { 0 };
 	int			ret;
 
@@ -160,16 +158,16 @@ int client_connect(struct fi_info *prov, simple_context_t *ctx)
 
 	connected = 0;
 
-	ret = fi_fabric(prov->fabric_attr, &ctx->fabric, NULL);
+	ret = kfi_fabric(prov->fabric_attr, &ctx->fabric, NULL);
 	if (ret) {
-		print_err("fi_fabric returned %d\n", ret);
+		print_err("kfi_fabric returned %d\n", ret);
 		ctx->fabric = NULL;
 		return ret;
 	}
 
-	ret = fi_domain(ctx->fabric, prov, &ctx->domain, NULL);
+	ret = kfi_domain(ctx->fabric, prov, &ctx->domain, NULL);
 	if (ret) {
-		print_err("fi_fdomain returned %d\n", ret);
+		print_err("kfi_fdomain returned %d\n", ret);
 		ctx->domain = NULL;
 		return ret;
 	}
@@ -183,65 +181,65 @@ int client_connect(struct fi_info *prov, simple_context_t *ctx)
 	prov->rx_attr->iov_limit = 1;
 	prov->tx_attr->inject_size = 0;	/* no INLINE support */
 
-	ret = fi_endpoint(ctx->domain, prov, &ctx->ep, CONTEXT);
+	ret = kfi_endpoint(ctx->domain, prov, &ctx->ep, CONTEXT);
 	if (ret) {
-		print_err("fi_endpoint returned %d\n", ret);
+		print_err("kfi_endpoint returned %d\n", ret);
 		ctx->ep = NULL;
 		return ret;
 	}
 
-	eq_attr.wait_obj	= FI_WAIT_NONE;
+	eq_attr.wait_obj	= KFI_WAIT_NONE;
 
-	ret = fi_eq_open(ctx->fabric, &eq_attr, &ctx->eq, NULL);
+	ret = kfi_eq_open(ctx->fabric, &eq_attr, &ctx->eq, NULL);
 	if (ret) {
-		print_err("fi_eq_open returned %d\n", ret);
+		print_err("kfi_eq_open returned %d\n", ret);
 		ctx->eq = NULL;
 		return ret;
 	}
 
 	cq_attr.size		= post_depth * 4;
-	cq_attr.flags		= FI_SEND;
-	cq_attr.format		= FI_CQ_FORMAT_MSG;
-	cq_attr.wait_obj	= FI_WAIT_NONE;
-	cq_attr.wait_cond	= FI_CQ_COND_NONE;
+	cq_attr.flags		= KFI_SEND;
+	cq_attr.format		= KFI_CQ_FORMAT_MSG;
+	cq_attr.wait_obj	= KFI_WAIT_NONE;
+	cq_attr.wait_cond	= KFI_CQ_COND_NONE;
 
-	ret = fi_cq_open(ctx->domain, &cq_attr, &ctx->scq, NULL);
+	ret = kfi_cq_open(ctx->domain, &cq_attr, &ctx->scq, NULL);
 	if (ret) {
-		print_err("fi_cq_open returned %d\n", ret);
+		print_err("kfi_cq_open returned %d\n", ret);
 		ctx->scq = NULL;
 		return ret;
 	}
 
-	cq_attr.flags		= FI_RECV;
+	cq_attr.flags		= KFI_RECV;
 
-	ret = fi_cq_open(ctx->domain, &cq_attr, &ctx->rcq, NULL);
+	ret = kfi_cq_open(ctx->domain, &cq_attr, &ctx->rcq, NULL);
 	if (ret) {
-		print_err("fi_cq_open returned %d\n", ret);
+		print_err("kfi_cq_open returned %d\n", ret);
 		ctx->rcq = NULL;
 		return ret;
 	}
 
-	ret = fi_ep_bind(ctx->ep, &ctx->eq->fid, 0);
+	ret = kfi_ep_bind(ctx->ep, &ctx->eq->fid, 0);
 	if (ret) {
-		print_err("fi_ep_bind returned %d\n", ret);
+		print_err("kfi_ep_bind returned %d\n", ret);
 		return ret;
 	}
 
-	ret = fi_ep_bind(ctx->ep, &ctx->scq->fid, FI_SEND);
+	ret = kfi_ep_bind(ctx->ep, &ctx->scq->fid, KFI_SEND);
 	if (ret) {
-		print_err("fi_ep_bind returned %d\n", ret);
+		print_err("kfi_ep_bind returned %d\n", ret);
 		return ret;
 	}
 
-	ret = fi_ep_bind(ctx->ep, &ctx->rcq->fid, FI_RECV);
+	ret = kfi_ep_bind(ctx->ep, &ctx->rcq->fid, KFI_RECV);
 	if (ret) {
-		print_err("fi_ep_bind returned %d\n", ret);
+		print_err("kfi_ep_bind returned %d\n", ret);
 		return ret;
 	}
 
-	ret = fi_enable(ctx->ep);
+	ret = kfi_enable(ctx->ep);
 	if (ret) {
-		print_err("fi_enable returned %d\n", ret);
+		print_err("kfi_enable returned %d\n", ret);
 		return ret;
 	}
 
@@ -255,9 +253,9 @@ int client_connect(struct fi_info *prov, simple_context_t *ctx)
 		return -EINVAL;
 	}
 
-	ret = fi_connect(ctx->ep, &addr, PRIVATE_DATA, sizeof(PRIVATE_DATA));
+	ret = kfi_connect(ctx->ep, &addr, PRIVATE_DATA, sizeof(PRIVATE_DATA));
 	if (ret) {
-		print_err("fi_connect returned %d\n", ret);
+		print_err("kfi_connect returned %d\n", ret);
 		return ret;
 	}
 
@@ -273,15 +271,15 @@ void client_disconnect(simple_context_t *ctx)
 	print_trace("in\n");
 
 	if (connected) {
-		ret = fi_shutdown(ctx->ep, 0);
+		ret = kfi_shutdown(ctx->ep, 0);
 		if (ret)
-			print_err("ERR: fi_shutdown() '%s'\n",
-				fi_strerror(ret));
+			print_err("ERR: kfi_shutdown() '%s'\n",
+				kfi_strerror(ret));
 		connected = 0;
 	}
 
 	if (ctx->mr) {
-		fi_close((struct fid *) ctx->mr);
+		kfi_close((struct kfid *) ctx->mr);
 		ctx->mr = NULL;
 	}
 	if (!IS_ERR(ctx->buf)) {
@@ -289,34 +287,34 @@ void client_disconnect(simple_context_t *ctx)
 		ctx->buf = NULL;
 	}
 	if (ctx->rcq) {
-		fi_close((struct fid *) ctx->rcq);
+		kfi_close((struct kfid *) ctx->rcq);
 		ctx->rcq = NULL;
 	}
 	if (ctx->scq) {
-		fi_close((struct fid *) ctx->scq);
+		kfi_close((struct kfid *) ctx->scq);
 		ctx->scq = NULL;
 	}
 	if (ctx->eq) {
-		fi_close((struct fid *) ctx->eq);
+		kfi_close((struct kfid *) ctx->eq);
 		ctx->eq = NULL;
 	}
 	if (ctx->ep) {
-		fi_close((struct fid *) ctx->ep);
+		kfi_close((struct kfid *) ctx->ep);
 		ctx->ep = NULL;
 	}
 	if (ctx->domain) {
-		fi_close((struct fid *) ctx->domain);
+		kfi_close((struct kfid *) ctx->domain);
 		ctx->domain = NULL;
 	}
 	if (ctx->fabric) {
-		fi_close((struct fid *) ctx->fabric);
+		kfi_close((struct kfid *) ctx->fabric);
 		ctx->fabric = NULL;
 	}
 }
 
 int do_test(void)
 {
-	struct fi_cq_msg_entry	comp;
+	struct kfi_cq_msg_entry	comp;
 	int			len = msg_len * post_depth;
 	int			msg_cnt = num_msgs;
 	int			tx_bufs_sent = 0;
@@ -336,10 +334,10 @@ int do_test(void)
 			return -ENOMEM;
 		}
 
-		ret = fi_mr_reg(ctx.domain, ctx.buf, len, 0, 0, 0, 0,
+		ret = kfi_mr_reg(ctx.domain, ctx.buf, len, 0, 0, 0, 0,
 				&ctx.mr, NULL);
 		if (ret) {
-			print_err("fi_mr_reg returned %d\n", ret);
+			print_err("kfi_mr_reg returned %d\n", ret);
 			kfree(ctx.buf);
 			ctx.buf = ERR_PTR(-EFAULT);
 			return ret;
@@ -368,11 +366,11 @@ int do_test(void)
 				tx_bufs_sent++;
 			}
 
-			ret = fi_send(ctx.ep, mp, msg_len, fi_mr_desc(ctx.mr),
+			ret = kfi_send(ctx.ep, mp, msg_len, kfi_mr_desc(ctx.mr),
 					0, mp);
 			if (ret) {
-				print_err("fi_send returned %d '%s'\n",
-					ret, fi_strerror(ret));
+				print_err("kfi_send returned %d '%s'\n",
+					ret, kfi_strerror(ret));
 				return ret;
 			}
 			if (kthread_should_stop())
@@ -382,23 +380,23 @@ int do_test(void)
 		/* reap completions */
 		for (cnt = 0; cnt < post_cnt; cnt++) {
 #if SREAD
-			ret = fi_cq_sread(ctx.scq, &comp, 1, 0, TIMEOUT);
+			ret = kfi_cq_sread(ctx.scq, &comp, 1, 0, TIMEOUT);
 			if (ret == -ETIMEDOUT) {
 				print_msg("%s(ETIMEDOUT) cnt %d post_cnt %d "
-					"msg_cnt %d\n", "fi_cq_sread", cnt,
+					"msg_cnt %d\n", "kfi_cq_sread", cnt,
 					post_cnt, msg_cnt);
 			}
 			if (kthread_should_stop())
 				return -EINTR;
 #else
 			do {
-				ret = fi_cq_read(ctx.scq, &comp, 1);
+				ret = kfi_cq_read(ctx.scq, &comp, 1);
 				if (ret == 0 || ret == -EAGAIN) {
 					if (--eagain_cnt <= 0) {
 						dprint(DEBUG_HIGH,
 							"%s(resched %d) cnt "
 							"%d post_cnt %d\n",
-							"fi_cq_read", ret, cnt,
+							"kfi_cq_read", ret, cnt,
 							post_cnt);
 						eagain_cnt = EAGAIN_TRIES;
 						schedule();
@@ -410,21 +408,21 @@ int do_test(void)
 
 #endif
 			if (ret < 0) {
-				struct fi_cq_err_entry cqe = { 0 };
+				struct kfi_cq_err_entry cqe = { 0 };
 				int rc;
 
-				rc = fi_cq_readerr(ctx.scq, &cqe, 0);
-				print_err("fi_cq_read returned %d '%s'\n",
-					ret, fi_strerror(ret));
+				rc = kfi_cq_readerr(ctx.scq, &cqe, 0);
+				print_err("kfi_cq_read returned %d '%s'\n",
+					ret, kfi_strerror(ret));
 				if (rc) {
 					char buf[64];
 
-					print_err("fi_cq_readerr() err '%s'(%d)"
-						"\n", fi_strerror(cqe.err),
+					print_err("kfi_cq_readerr() err '%s'(%d)"
+						"\n", kfi_strerror(cqe.err),
 						cqe.err);
-					print_err("fi_cq_readerr() prov_err "
+					print_err("kfi_cq_readerr() prov_err "
 						"'%s'(%d)\n",
-						fi_cq_strerror(ctx.scq,
+						kfi_cq_strerror(ctx.scq,
 							cqe.prov_errno,
 							cqe.err_data, buf,
 							sizeof(buf)),
@@ -433,7 +431,7 @@ int do_test(void)
 				return ret;
 			}
 			if (!ret)
-				print_err("fi_cq_sread no completion? ret %d\n",
+				print_err("kfi_cq_sread no completion? ret %d\n",
 					ret);
 #if 0
 			if ((char *)comp.op_context < (char *)ctx.buf ||
@@ -500,9 +498,9 @@ int do_test(void)
 
 int create_connection(void)
 {
-	struct fi_info		*prov;
-	struct fi_eq_cm_entry	entry;
-	struct fi_info		*info;
+	struct kfi_info		*prov;
+	struct kfi_eq_cm_entry	entry;
+	struct kfi_info		*info;
 	ssize_t			n;
 	uint32_t		event;
 	int			ret = -1;
@@ -519,36 +517,36 @@ int create_connection(void)
 
 	dprint(DEBUG_CONNECT, "Waiting for Server to connect\n");
 
-	n = fi_eq_sread(ctx.eq, &event, &entry, sizeof(entry), CTIMEOUT, 0);
+	n = kfi_eq_sread(ctx.eq, &event, &entry, sizeof(entry), CTIMEOUT, 0);
 	if (n < sizeof(entry)) {
-		struct fi_eq_err_entry eqe;
+		struct kfi_eq_err_entry eqe;
 		int rc;
 
-		print_err("fi_eq_sread '%s'(%d)\n", fi_strerror(n), (int) n);
-		rc = fi_eq_readerr(ctx.eq, &eqe, 0);
+		print_err("kfi_eq_sread '%s'(%d)\n", kfi_strerror(n), (int) n);
+		rc = kfi_eq_readerr(ctx.eq, &eqe, 0);
 		if (rc)
-			print_err("fi_eq_readerr() returns %d '%s'\n",
-				rc, fi_strerror(rc));
+			print_err("kfi_eq_readerr() returns %d '%s'\n",
+				rc, kfi_strerror(rc));
 		else {
 			char buf[64];
 
-			print_err("fi_eq_readerr() prov_err '%s'(%d)\n",
-				fi_eq_strerror(ctx.eq, eqe.prov_errno,
+			print_err("kfi_eq_readerr() prov_err '%s'(%d)\n",
+				kfi_eq_strerror(ctx.eq, eqe.prov_errno,
 					eqe.err_data, buf, sizeof(buf)),
 				eqe.prov_errno);
-			print_err("fi_eq_readerr() err '%s'(%d)\n",
-					fi_strerror(eqe.err), eqe.err);
+			print_err("kfi_eq_readerr() err '%s'(%d)\n",
+					kfi_strerror(eqe.err), eqe.err);
 		}
 
 		return (int) n;
 	}
 
-	if (event != FI_CONNECTED) {
+	if (event != KFI_CONNECTED) {
 		print_err("unexpected event %d\n", event);
-		return -FI_EOTHER;
+		return -EIO;
 	}
 
-	/* same context specified in fi_endpoint()? */
+	/* same context specified in kfi_endpoint()? */
 	if (entry.fid->context != CONTEXT) {
 		print_err("entry.fid->context %lx != %lx\n",
 			(ulong)entry.fid->context, (ulong)CONTEXT);
@@ -564,7 +562,7 @@ int create_connection(void)
 	return 0;
 err2:
 	client_disconnect(&ctx);
-	fi_freeinfo(prov);
+	kfi_freeinfo(prov);
 err1:
 	return ret;
 }

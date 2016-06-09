@@ -34,17 +34,12 @@
 #define _KFI_DOMAIN_H_
 
 #include <kfabric.h>
-#include <kfi_fi_eq.h>
+#include <kfi_eq.h>
 
 /*
  * AV = Address Vector
  * Maps and stores transport/network addresses.
  */
-
-enum kfi_av_type {
-	KFI_AV_MAP,
-	KFI_AV_TABLE
-};
 
 struct kfi_av_attr {
 	enum kfi_av_type	type;
@@ -75,7 +70,7 @@ struct kfi_ops_av {
 };
 
 struct kfid_av {
-	struct kfid		kfid;
+	struct kfid		fid;
 	struct kfi_ops_av	*ops;
 };
 
@@ -86,13 +81,13 @@ struct kfid_av {
  * but also for local access until we can remove that need.
  */
 struct kfid_mr {
-	struct kfid		kfid;
+	struct kfid		fid;
 	void			*mem_desc;
 	uint64_t		key;
 };
 
 struct kfi_mr_attr {
-	const struct iovec	*mr_iov;
+	const struct kvec	*mr_iov;
 	size_t			iov_count;
 	uint64_t		access;
 	uint64_t		offset;
@@ -135,15 +130,15 @@ struct kfi_ops_domain {
 
 struct kfi_ops_mr {
 	size_t	size;
-	int	(*reg)(struct kfid *kfid, const void *buf, size_t len,
+	int	(*reg)(struct kfid *fid, const void *buf, size_t len,
 			uint64_t access, uint64_t offset,
 			uint64_t requested_key, uint64_t flags,
-			struct kfid_mr **mr, void *context);
-	int	(*regv)(struct kfid *kfid, const struct iovec *iov,
+			struct kfid_mr **mr, void *context, uint64_t *dma_addr);
+	int	(*regv)(struct kfid *fid, const struct kvec *iov,
 			size_t count, uint64_t access,
 			uint64_t offset, uint64_t requested_key,
 			uint64_t flags, struct kfid_mr **mr, void *context);
-	int	(*regattr)(struct kfid *kfid, const struct kfi_mr_attr *attr,
+	int	(*regattr)(struct kfid *fid, const struct kfi_mr_attr *attr,
 			uint64_t flags, struct kfid_mr **mr);
 };
 
@@ -151,7 +146,7 @@ struct kfi_ops_mr {
 #define KFI_REG_MR	(1ULL << 0)
 
 struct kfid_domain {
-	struct kfid		kfid;
+	struct kfid		fid;
 	struct kfi_ops_domain	*ops;
 	struct kfi_ops_mr	*mr;
 };
@@ -167,9 +162,9 @@ kfi_domain(struct kfid_fabric *fabric, struct kfi_info *info,
 }
 
 static inline int
-kfi_domain_bind(struct kfid_domain *domain, struct kfid *kfid, uint64_t flags)
+kfi_domain_bind(struct kfid_domain *domain, struct kfid *fid, uint64_t flags)
 {
-	return domain->kfid.ops->bind(&domain->kfid, kfid, flags);
+	return domain->fid.ops->bind(&domain->fid, fid, flags);
 }
 
 static inline int
@@ -203,10 +198,11 @@ kfi_poll_open(struct kfid_domain *domain, struct kfi_poll_attr *attr,
 static inline int
 kfi_mr_reg(struct kfid_domain *domain, const void *buf, size_t len,
 	   uint64_t access, uint64_t offset, uint64_t requested_key,
-	   uint64_t flags, struct kfid_mr **mr, void *context)
+	   uint64_t flags, struct kfid_mr **mr, void *context,
+	   uint64_t *dma_addr)
 {
-	return domain->mr->reg(&domain->kfid, buf, len, access, offset,
-			       requested_key, flags, mr, context);
+	return domain->mr->reg(&domain->fid, buf, len, access, offset,
+			       requested_key, flags, mr, context, dma_addr);
 }
 
 static inline void *kfi_mr_desc(struct kfid_mr *mr)
@@ -219,10 +215,10 @@ static inline uint64_t kfi_mr_key(struct kfid_mr *mr)
 	return mr->key;
 }
 
-static inline int kfi_mr_bind(struct kfid_mr *mr, struct kfid *bkfid,
+static inline int kfi_mr_bind(struct kfid_mr *mr, struct kfid *bfid,
 			      uint64_t flags)
 {
-	return mr->kfid.ops->bind(&mr->kfid, bkfid, flags);
+	return mr->fid.ops->bind(&mr->fid, bfid, flags);
 }
 
 static inline int
@@ -233,9 +229,9 @@ kfi_av_open(struct kfid_domain *domain, struct kfi_av_attr *attr,
 }
 
 static inline int
-kfi_av_bind(struct kfid_av *av, struct kfid *kfid, uint64_t flags)
+kfi_av_bind(struct kfid_av *av, struct kfid *fid, uint64_t flags)
 {
-	return av->kfid.ops->bind(&av->kfid, kfid, flags);
+	return av->fid.ops->bind(&av->fid, fid, flags);
 }
 
 static inline int
@@ -254,8 +250,8 @@ kfi_av_insertsvc(struct kfid_av *av, const char *node, const char *service,
 
 static inline int
 kfi_av_insertsym(struct kfid_av *av, const char *node, size_t nodecnt,
-		kconst char *service, size_t svccnt,
-		kfi_addr_t *kfi_addr, uint64_t flags, void *context)
+		 const char *service, size_t svccnt,
+		 kfi_addr_t *kfi_addr, uint64_t flags, void *context)
 {
 	return av->ops->insertsym(av, node, nodecnt, service, svccnt,
 			kfi_addr, flags, context);

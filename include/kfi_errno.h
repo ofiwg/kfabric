@@ -229,6 +229,6 @@
 #define KKFI_ETRUNC		265		/* Truncation error */
 #define KKFI_ENOKEY		266		/* Required key not available */
 
-const char *fi_strerror(int errnum);
+const char *kfi_strerror(int errnum);
 
 #endif /* _KKFI_ERRNO_H_ */

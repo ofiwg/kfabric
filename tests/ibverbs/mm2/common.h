@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Intel Corporation. All rights reserved.
+ * Copyright (c) 2016 Intel Corporation. All rights reserved.
  *
  * This software is available to you under a choice of one of two
  * licenses.  You may choose to be licensed under the terms of the GNU
@@ -30,12 +30,18 @@
  * SOFTWARE.
  */
 
-#ifndef _TEST_H_
-#define _TEST_H_
+#ifndef _COMMON_H_
+#define _COMMON_H_
 
-#include <net/kfi/debug.h>
+#include <linux/kthread.h>
+#include <kfi_debug.h>
+#include <kfi_log.h>
+#include <kfi_errno.h>
 
-#define DRV_PFX "[" DRV_NAME "] "
+/* KFI test server-side */
+#define THREAD_NAME KBUILD_MODNAME
+#define PFX "[" THREAD_NAME "] "
+#define DRV_PFX PFX
 
 #define TEST_MESSAGE "Yadda, yadda...(%03d)"
 
@@ -67,4 +73,4 @@ int create_connection(void);
 int do_test(void);
 void destroy_connection(void);
 
-#endif /* _TEST_H_ */
+#endif /* _COMMON_H_ */

@@ -1,14 +1,11 @@
 KFI_TOP ?=$(shell pwd)/../../../..
 KFI=$(KFI_TOP)/kfi
 
-MODULE_NAME=kfit_verbs_mm2_srv
+MODULE_NAME=kfit_ibv_mm2_srv
 
 ifneq ("","$(wildcard /usr/src/compat-rdma)")
   #for OFED-3.12
   OFED_DIR:=/usr/src/compat-rdma
-else ifneq ("","$(wildcard /usr/src/ofa_kernel)")
-  #for OFED 1.5.4.1
-  OFED_DIR:=/usr/src/ofa_kernel
 else
   OFED_DIR:=
 endif
@@ -17,10 +14,26 @@ KDIR ?= /lib/modules/`uname -r`/build
 autoconf_h=$(shell /bin/ls -1 $(KDIR)/include/*/autoconf.h | head -1)
 kconfig_h=$(shell /bin/ls -1 $(KDIR)/include/*/kconfig.h 2>/dev/null | head -1)
 
-KSYM := $(KFI)/Module.symvers
+KSYM := $(KFI_TOP)/Module.symvers
 
 ifeq ("$(OFED_DIR)","")
- INCLUDES:=
+  autoconf_h=$(shell /bin/ls -1 $(KDIR)/include/*/autoconf.h | head -1)
+  kconfig_h=$(shell /bin/ls -1 $(KDIR)/include/*/kconfig.h 2>/dev/null | head -1)
+
+  INCLUDES+=	-DCONFIG_KFI_DEBUG \
+		-I$(KFI_TOP)/include \
+		-Iarch/x86/include \
+		-Iarch/x86/include/generated/uapi \
+		-Iarch/x86/include/generated \
+		-Iinclude \
+		-Iarch/x86/include/uapi \
+		-Iarch/x86/include/generated/uapi \
+		-Iinclude/uapi \
+		-Iinclude/generated/uapi
+
+  ifneq ($(kconfig_h),)
+   INCLUDES+= -include $(kconfig_h)
+  endif
 else
  KSYM += $(OFED_DIR)/Module.symvers
 
@@ -48,8 +61,8 @@ KBUILD_SRC=$(KDIR)
 
 obj-m += $(MODULE_NAME).o
 
-$(MODULE_NAME)-y := test.o
-$(MODULE_NAME)-y += main.o
+$(MODULE_NAME)-y := main.o
+$(MODULE_NAME)-y += test.o
 
 ccflags-y += -I$(src)/..
 
@@ -66,9 +79,9 @@ main.o: main.c Makefile
 test.o: test.c Makefile
 
 LOC:=$(shell ip addr show ib0 | fgrep 'inet ' | cut -f 6 -d' ' | cut -f 1 -d '/')
-LEN ?=128	# payload length
-NM ?=1		# total num msgs
-PD ?=1		# post-depth
+LEN ?=128
+NM ?=1	# total num msgs
+PD ?=1	# post-depth
 ARGS=local_ipaddr=$(LOC) msg_len=$(LEN) num_msgs=$(NM) post_depth=$(PD) verify=0 debug=0
 
 load:
@@ -126,9 +139,12 @@ kfi_load: kfi_unload
 	@if [ `lsmod | grep -c rdma` -eq 0 ] ; then sudo modprobe rdma_cm ; fi
 	@echo loading kfi.ko
 	@sudo insmod $(KFI_TOP)/kfi/kfi.ko
-	@echo loading kfip_verbs.ko
-	@sudo insmod $(KFI_TOP)/providers/verbs/*.ko
+	@echo loading kfip_ibv.ko
+	@sudo insmod $(KFI_TOP)/providers/ibverbs/*.ko
+	@echo loading kfip_rds.ko
+	@sudo insmod $(KFI_TOP)/providers/rds/*.ko
 
 kfi_unload:
-	@sudo rmmod kfip_verbs.ko 2>/dev/null || echo > /dev/null
+	@sudo rmmod kfip_rds.ko 2>/dev/null || echo > /dev/null
+	@sudo rmmod kfip_ibv.ko 2>/dev/null || echo > /dev/null
 	@sudo rmmod kfi.ko 2>/dev/null || echo > /dev/null

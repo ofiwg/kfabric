@@ -1,16 +1,6 @@
 
-1) Update to 'offical' libfabric v1.0; current code is based on
-   libfabric 1.0-rc3, rc6 became offical 1.0.
-
-2) Remove all instances of FI_* error codes, replace with std linux errno.h
+1) Remove all instances of KFI_* error codes, replace with std linux/errno.h
    codes.
 
-3) Replace all instances of fi_* to kfi_*.
-	Perhaps starting with include/net/kfi/fi*.h renamed to kfi*.h.
-	rename *.h file contents, fi_*, FI_* --> kfi_*, KFI_*.
-	fix kfi/ prov/ibverbs/ & tests/[getinfo,mm2].
-
-4) Set fi_strerror() full-text output to be under KFI_DEBUG.
-
-5) Complete the verbs provider such that Infiniband & iWARP devices supported.
+2) Set kfi_strerror() full-text output to be under KFI_DEBUG.
 

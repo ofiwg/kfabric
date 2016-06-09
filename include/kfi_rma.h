@@ -33,7 +33,7 @@
 #ifndef _KFI_RMA_H_
 #define _KFI_RMA_H_
 
-#include <kfi_fabric.h>
+#include <kfabric.h>
 #include <kfi_endpoint.h>
 
 
@@ -43,14 +43,8 @@ struct kfi_rma_iov {
 	uint64_t		key;
 };
 
-struct kfi_rma_ioc {
-	uint64_t		addr;
-	size_t			count;
-	uint64_t		key;
-};
-
 struct kfi_msg_rma {
-	const struct iovec	 *msg_iov;
+	const struct kvec	 *msg_iov;
 	void			 **desc;
 	size_t			 iov_count;
 	kfi_addr_t		 addr;
@@ -65,7 +59,7 @@ struct kfi_ops_rma {
 	ssize_t	(*read)(struct kfid_ep *ep, void *buf, size_t len, void *desc,
 			kfi_addr_t src_addr, uint64_t addr, uint64_t key,
 			void *context);
-	ssize_t	(*readv)(struct kfid_ep *ep, const struct iovec *iov,
+	ssize_t	(*readv)(struct kfid_ep *ep, const struct kvec *iov,
 			 void **desc, size_t count, kfi_addr_t src_addr,
 			 uint64_t addr, uint64_t key, void *context);
 	ssize_t	(*readmsg)(struct kfid_ep *ep, const struct kfi_msg_rma *msg,
@@ -73,7 +67,7 @@ struct kfi_ops_rma {
 	ssize_t	(*write)(struct kfid_ep *ep, const void *buf, size_t len,
 			 void *desc, kfi_addr_t dest_addr, uint64_t addr,
 			 uint64_t key, void *context);
-	ssize_t	(*writev)(struct kfid_ep *ep, const struct iovec *iov,
+	ssize_t	(*writev)(struct kfid_ep *ep, const struct kvec *iov,
 			 void **desc, size_t count, kfi_addr_t dest_addr,
 			 uint64_t addr, uint64_t key, void *context);
 	ssize_t	(*writemsg)(struct kfid_ep *ep, const struct kfi_msg_rma *msg,
@@ -99,7 +93,7 @@ kfi_read(struct kfid_ep *ep, void *buf, size_t len, void *desc,
 }
 
 static inline ssize_t
-kfi_readv(struct kfid_ep *ep, const struct iovec *iov, void **desc,
+kfi_readv(struct kfid_ep *ep, const struct kvec *iov, void **desc,
 	  size_t count, kfi_addr_t src_addr, uint64_t addr, uint64_t key,
 	  void *context)
 {
@@ -122,7 +116,7 @@ kfi_write(struct kfid_ep *ep, const void *buf, size_t len, void *desc,
 }
 
 static inline ssize_t
-kfi_writev(struct kfid_ep *ep, const struct iovec *iov, void **desc,
+kfi_writev(struct kfid_ep *ep, const struct kvec *iov, void **desc,
 	   size_t count, kfi_addr_t dest_addr, uint64_t addr, uint64_t key,
 	   void *context)
 {
@@ -144,9 +138,9 @@ kfi_inject_write(struct kfid_ep *ep, const void *buf, size_t len,
 }
 
 static inline ssize_t
-ki_writedata(struct kid_ep *ep, const void *buf, size_t len, void *desc,
-	     uint64_t data, kfi_addr_t dest_addr, uint64_t addr, uint64_t key,
-	     void *context)
+kfi_writedata(struct kfid_ep *ep, const void *buf, size_t len, void *desc,
+	      uint64_t data, kfi_addr_t dest_addr, uint64_t addr, uint64_t key,
+	      void *context)
 {
 	return ep->rma->writedata(ep, buf, len, desc, data, dest_addr,
 				  addr, key, context);

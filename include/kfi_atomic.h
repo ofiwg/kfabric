@@ -33,13 +33,7 @@
 #ifndef _KFI_ATOMIC_H_
 #define _KFI_ATOMIC_H_
 
-#include <linux/socket.h>
-#include <kfabric.h>
 #include <kfi_endpoint.h>
-#include <kfi_rma.h>
-
-
-#ifndef FABRIC_DIRECT
 
 enum kfi_datatype {
 	KFI_INT8,
@@ -82,145 +76,149 @@ enum kfi_op {
 	KFI_ATOMIC_OP_LAST
 };
 
-#else
-#include <kfi_direct_atomic_def.h>
-#endif /* KFABRIC_DIRECT */
-
-struct kfi_msg_atomic {
-	const struct kfi_ioc	*msg_iov;
-	void			**desc;
-	size_t			iov_count;
-	fi_addr_t		addr;
-	const struct fi_rma_ioc	*rma_iov;
-	size_t			rma_iov_count;
-	enum fi_datatype	datatype;
-	enum fi_op		op;
-	void			*context;
-	uint64_t		data;
+struct kfi_ioc {
+	void			*addr;
+	size_t			count;
 };
 
-struct fi_ops_atomic {
+struct kfi_rma_ioc {
+	uint64_t                addr;
+	size_t                  count;
+	uint64_t                key;
+};
+
+struct kfi_msg_atomic {
+	const struct kfi_ioc		*msg_iov;
+	void				**desc;
+	size_t				iov_count;
+	kfi_addr_t			addr;
+	const struct kfi_rma_ioc	*rma_iov;
+	size_t				rma_iov_count;
+	enum kfi_datatype		datatype;
+	enum kfi_op			op;
+	void				*context;
+	uint64_t			data;
+};
+
+struct kfi_ops_atomic {
 	size_t	size;
 	ssize_t	(*write)(struct kfid_ep *ep, const void *buf, size_t count,
-			 void *desc, fi_addr_t dest_addr, uint64_t addr,
-			 uint64_t key, enum fi_datatype datatype,
-			 enum fi_op op, void *context);
-	ssize_t	(*writev)(struct kfid_ep *ep, const struct fi_ioc *iov,
-			  void **desc, size_t count, fi_addr_t dest_addr,
+			 void *desc, kfi_addr_t dest_addr, uint64_t addr,
+			 uint64_t key, enum kfi_datatype datatype,
+			 enum kfi_op op, void *context);
+	ssize_t	(*writev)(struct kfid_ep *ep, const struct kfi_ioc *iov,
+			  void **desc, size_t count, kfi_addr_t dest_addr,
 			  uint64_t addr, uint64_t key,
-			  enum fi_datatype datatype,
-			  enum fi_op op, void *context);
+			  enum kfi_datatype datatype,
+			  enum kfi_op op, void *context);
 	ssize_t	(*writemsg)(struct kfid_ep *ep,
-			    const struct fi_msg_atomic *msg, uint64_t flags);
+			    const struct kfi_msg_atomic *msg, uint64_t flags);
 	ssize_t	(*inject)(struct kfid_ep *ep, const void *buf, size_t count,
-			  fi_addr_t dest_addr, uint64_t addr, uint64_t key,
-			  enum fi_datatype datatype, enum fi_op op);
+			  kfi_addr_t dest_addr, uint64_t addr, uint64_t key,
+			  enum kfi_datatype datatype, enum kfi_op op);
 
 	ssize_t	(*readwrite)(struct kfid_ep *ep, const void *buf, size_t count,
 			     void *desc, void *result, void *result_desc,
-			     fi_addr_t dest_addr, uint64_t addr, uint64_t key,
-			     enum fi_datatype datatype,
-			     enum fi_op op, void *context);
-	ssize_t	(*readwritev)(struct kfid_ep *ep, const struct fi_ioc *iov,
-			      void **desc, size_t count, struct fi_ioc *resultv,
+			     kfi_addr_t dest_addr, uint64_t addr, uint64_t key,
+			     enum kfi_datatype datatype,
+			     enum kfi_op op, void *context);
+	ssize_t	(*readwritev)(struct kfid_ep *ep, const struct kfi_ioc *iov,
+			      void **desc, size_t count,
+			      struct kfi_ioc *resultv,
 			      void **result_desc, size_t result_count,
-			      fi_addr_t dest_addr, uint64_t addr, uint64_t key,
-			      enum fi_datatype datatype,
-			      enum fi_op op, void *context);
+			      kfi_addr_t dest_addr, uint64_t addr, uint64_t key,
+			      enum kfi_datatype datatype,
+			      enum kfi_op op, void *context);
 	ssize_t	(*readwritemsg)(struct kfid_ep *ep,
-				const struct fi_msg_atomic *msg,
-				struct fi_ioc *resultv, void **result_desc,
+				const struct kfi_msg_atomic *msg,
+				struct kfi_ioc *resultv, void **result_desc,
 				size_t result_count, uint64_t flags);
 
 	ssize_t	(*compwrite)(struct kfid_ep *ep, const void *buf, size_t count,
 			     void *desc, const void *compare,
 			     void *compare_desc, void *result,
-			     void *result_desc, fi_addr_t dest_addr,
+			     void *result_desc, kfi_addr_t dest_addr,
 			     uint64_t addr, uint64_t key,
-			     enum fi_datatype datatype,
-			     enum fi_op op, void *context);
-	ssize_t	(*compwritev)(struct kfid_ep *ep, const struct fi_ioc *iov,
+			     enum kfi_datatype datatype,
+			     enum kfi_op op, void *context);
+	ssize_t	(*compwritev)(struct kfid_ep *ep, const struct kfi_ioc *iov,
 			      void **desc, size_t count,
-			      const struct fi_ioc *comparev,
+			      const struct kfi_ioc *comparev,
 			      void **compare_desc, size_t compare_count,
-			      struct fi_ioc *resultv, void **result_desc,
-			      size_t result_count, fi_addr_t dest_addr,
+			      struct kfi_ioc *resultv, void **result_desc,
+			      size_t result_count, kfi_addr_t dest_addr,
 			      uint64_t addr, uint64_t key,
-			      enum fi_datatype datatype,
-			      enum fi_op op, void *context);
+			      enum kfi_datatype datatype,
+			      enum kfi_op op, void *context);
 	ssize_t	(*compwritemsg)(struct kfid_ep *ep,
-			const struct fi_msg_atomic *msg,
-			const struct fi_ioc *comparev, void **compare_desc,
-			size_t compare_count, struct fi_ioc *resultv,
+			const struct kfi_msg_atomic *msg,
+			const struct kfi_ioc *comparev, void **compare_desc,
+			size_t compare_count, struct kfi_ioc *resultv,
 			void **result_desc, size_t result_count,
 			uint64_t flags);
 
-	int	(*writevalid)(struct kfid_ep *ep, enum fi_datatype datatype,
-			      enum fi_op op, size_t *count);
-	int	(*readwritevalid)(struct kfid_ep *ep, enum fi_datatype datatype,
-				  enum fi_op op, size_t *count);
-	int	(*compwritevalid)(struct kfid_ep *ep, enum fi_datatype datatype,
-				  enum fi_op op, size_t *count);
+	int	(*writevalid)(struct kfid_ep *ep, enum kfi_datatype datatype,
+			      enum kfi_op op, size_t *count);
+	int	(*readwritevalid)(struct kfid_ep *ep,
+				  enum kfi_datatype datatype,
+				  enum kfi_op op, size_t *count);
+	int	(*compwritevalid)(struct kfid_ep *ep,
+				  enum kfi_datatype datatype,
+				  enum kfi_op op, size_t *count);
 };
 
-#ifndef KFABRIC_DIRECT
-
 static inline ssize_t
-fi_atomic(struct kfid_ep *ep,
-	  const void *buf, size_t count, void *desc,
-	  fi_addr_t dest_addr,
-	  uint64_t addr, uint64_t key,
-	  enum fi_datatype datatype, enum fi_op op, void *context)
+kfi_atomic(struct kfid_ep *ep, const void *buf, size_t count, void *desc,
+	   kfi_addr_t dest_addr, uint64_t addr, uint64_t key,
+	   enum kfi_datatype datatype, enum kfi_op op, void *context)
 {
 	return ep->atomic->write(ep, buf, count, desc, dest_addr, addr, key,
-			datatype, op, context);
+				 datatype, op, context);
 }
 
 static inline ssize_t
-fi_atomicv(struct kfid_ep *ep,
-	   const struct fi_ioc *iov, void **desc, size_t count,
-	   fi_addr_t dest_addr,
-	   uint64_t addr, uint64_t key,
-	   enum fi_datatype datatype, enum fi_op op, void *context)
+kfi_atomicv(struct kfid_ep *ep, const struct kfi_ioc *iov, void **desc,
+	    size_t count, kfi_addr_t dest_addr, uint64_t addr, uint64_t key,
+	    enum kfi_datatype datatype, enum kfi_op op, void *context)
 {
 	return ep->atomic->writev(ep, iov, desc, count, dest_addr, addr, key,
-			datatype, op, context);
+				  datatype, op, context);
 }
 
 static inline ssize_t
-fi_atomicmsg(struct kfid_ep *ep,
-	     const struct fi_msg_atomic *msg, uint64_t flags)
+kfi_atomicmsg(struct kfid_ep *ep, const struct kfi_msg_atomic *msg,
+	      uint64_t flags)
 {
 	return ep->atomic->writemsg(ep, msg, flags);
 }
 
 static inline ssize_t
-fi_inject_atomic(struct kfid_ep *ep, const void *buf, size_t count,
-		 fi_addr_t dest_addr, uint64_t addr, uint64_t key,
-		 enum fi_datatype datatype, enum fi_op op)
+kfi_inject_atomic(struct kfid_ep *ep, const void *buf, size_t count,
+		  kfi_addr_t dest_addr, uint64_t addr, uint64_t key,
+		  enum kfi_datatype datatype, enum kfi_op op)
 {
 	return ep->atomic->inject(ep, buf, count, dest_addr, addr,
 			key, datatype, op);
 }
 
 static inline ssize_t
-fi_fetch_atomic(struct kfid_ep *ep,
-		const void *buf, size_t count, void *desc,
-		void *result, void *result_desc,
-		fi_addr_t dest_addr,
-		uint64_t addr, uint64_t key,
-		enum fi_datatype datatype, enum fi_op op, void *context)
+kfi_fetch_atomic(struct kfid_ep *ep,
+		 const void *buf, size_t count, void *desc,
+		 void *result, void *result_desc,
+		 kfi_addr_t dest_addr,
+		 uint64_t addr, uint64_t key,
+		 enum kfi_datatype datatype, enum kfi_op op, void *context)
 {
 	return ep->atomic->readwrite(ep, buf, count, desc, result, result_desc,
 			dest_addr, addr, key, datatype, op, context);
 }
 
 static inline ssize_t
-fi_fetch_atomicv(struct kfid_ep *ep, const struct fi_ioc *iov, void **desc,
-		 size_t count, struct fi_ioc *resultv, void **result_desc,
-		 size_t result_count, fi_addr_t dest_addr, uint64_t addr,
-		 uint64_t key, enum fi_datatype datatype,
-		 enum fi_op op, void *context)
+kfi_fetch_atomicv(struct kfid_ep *ep, const struct kfi_ioc *iov, void **desc,
+		  size_t count, struct kfi_ioc *resultv, void **result_desc,
+		   size_t result_count, kfi_addr_t dest_addr, uint64_t addr,
+		   uint64_t key, enum kfi_datatype datatype,
+		   enum kfi_op op, void *context)
 {
 	return ep->atomic->readwritev(ep, iov, desc, count,
 			resultv, result_desc, result_count,
@@ -228,20 +226,20 @@ fi_fetch_atomicv(struct kfid_ep *ep, const struct fi_ioc *iov, void **desc,
 }
 
 static inline ssize_t
-fi_fetch_atomicmsg(struct kfid_ep *ep, const struct fi_msg_atomic *msg,
-		   struct fi_ioc *resultv, void **result_desc,
-		   size_t result_count, uint64_t flags)
+kfi_fetch_atomicmsg(struct kfid_ep *ep, const struct kfi_msg_atomic *msg,
+		    struct kfi_ioc *resultv, void **result_desc,
+		    size_t result_count, uint64_t flags)
 {
 	return ep->atomic->readwritemsg(ep, msg, resultv, result_desc,
 			result_count, flags);
 }
 
 static inline ssize_t
-fi_compare_atomic(struct kfid_ep *ep, const void *buf, size_t count, void *desc,
-		  const void *compare, void *compare_desc, void *result,
-		  void *result_desc, fi_addr_t dest_addr, uint64_t addr,
-		  uint64_t key, enum fi_datatype datatype,
-		  enum fi_op op, void *context)
+kfi_compare_atomic(struct kfid_ep *ep, const void *buf, size_t count,
+		   void *desc, const void *compare, void *compare_desc,
+		   void *result, void *result_desc, kfi_addr_t dest_addr,
+		   uint64_t addr, uint64_t key, enum kfi_datatype datatype,
+		   enum kfi_op op, void *context)
 {
 	return ep->atomic->compwrite(ep, buf, count, desc,
 			compare, compare_desc, result, result_desc,
@@ -282,8 +280,8 @@ kfi_atomicvalid(struct kfid_ep *ep, enum kfi_datatype datatype,
 }
 
 static inline int
-kfi_fetch_atomicvalid(struct kfid_ep *ep,
-		     enum kfi_datatype datatype, enum kfi_op op, size_t *count)
+kfi_fetch_atomicvalid(struct kfid_ep *ep, enum kfi_datatype datatype,
+		      enum kfi_op op, size_t *count)
 {
 	return ep->atomic->readwritevalid(ep, datatype, op, count);
 }
@@ -294,9 +292,5 @@ kfi_compare_atomicvalid(struct kfid_ep *ep, enum kfi_datatype datatype,
 {
 	return ep->atomic->compwritevalid(ep, datatype, op, count);
 }
-
-#else /* KFABRIC_DIRECT */
-#include <kfi_direct_atomic.h>
-#endif
 
 #endif /* _KFI_ATOMIC_H_ */

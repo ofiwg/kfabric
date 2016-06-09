@@ -1,7 +1,7 @@
 
-KFI (Kernel Fabric Interface) tests
+kfabric (Kernel Fabric Interface) tests
 
-getinfo/	fi_getinfo() test - dumps all fi_info records.
+getinfo/	kfi_getinfo() test - dumps all kfi_info records.
 
 ibverbs/	kfi over Infiniband provider tests
 	mm2/	Tx/Rx multiple messages between client & server.

@@ -525,5 +525,14 @@ kfi_getprov(const char *prov_name)
 	return prov;
 }
 
+const char *kfi_strerror(int errnum)
+{
+        static char buf[16];
+
+        snprintf(buf, sizeof(buf), "%d", errnum);
+        return buf;
+}
+EXPORT_SYMBOL(kfi_strerror);
+
 module_init(kfi_init);
 module_exit(kfi_exit);

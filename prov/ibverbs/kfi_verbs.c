@@ -41,7 +41,6 @@
 #include <kfi_prov.h>
 #include <kfi_endpoint.h>
 #include <kfi_cm.h>
-#include <kfi_msg.h>
 #include <kfi_rma.h>
 #include <kfi_atomic.h>
 #include <kfi_tagged.h>
