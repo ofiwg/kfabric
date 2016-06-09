@@ -1,7 +1,7 @@
 
 KFI/verbs provider test: client side.
 
-  Pass multiple message of specified len in bytes
+  Pass multiple message of specified byte len
 
 Adjust SVR=ipAddr in Makefile to send to correct server: default 192.168.x.y
 

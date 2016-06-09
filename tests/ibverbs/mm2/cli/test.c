@@ -104,17 +104,12 @@ simple_context_t *kfi_to_simple_context(void *ctx)
 int match_provider(struct kfi_info **prov)
 {
 	struct kfi_info		hints = { 0 };
-	struct kfi_fabric_attr	attr = { 0 };
 	struct sockaddr_in	addr = { 0 };
 	int			ret;
 
-	print_trace("in\n");
-
 	/* ibverbs provider */
-	hints.ep_type		= KFI_EP_MSG;
-	hints.caps		= KFI_MSG | FI_CANCEL;
+	hints.caps		= KFI_MSG | KFI_CANCEL | KFI_RECV;
 	hints.addr_format	= KFI_SOCKADDR_IN;
-
 	hints.src_addr		= &addr;
 	hints.src_addrlen	= sizeof(addr);
 	addr.sin_family		= AF_INET;
@@ -128,10 +123,8 @@ int match_provider(struct kfi_info **prov)
 		return -EINVAL;
 	}
 
-	hints.fabric_attr	= &attr;
-	hints.fabric_attr->prov_name = kstrdup("ibverbs", GFP_KERNEL);
-
-	ret = kfi_getinfo(KFI_VERSION(1, 0), &hints, prov);
+	ret = kfi_getinfo(KFI_VERSION(KFI_MAJOR_VERSION, KFI_MINOR_VERSION),
+			  &hints, prov);
 	if (ret) {
 		print_err("ERR: kfi_getinfo() '%s'\n", kfi_strerror(ret));
 		return ret;
@@ -147,14 +140,12 @@ int match_provider(struct kfi_info **prov)
 	return 0;
 }
 
-int client_connect(struct fi_info *prov, simple_context_t *ctx)
+int client_connect(struct kfi_info *prov, simple_context_t *ctx)
 {
 	struct kfi_eq_attr	eq_attr = { 0 };
 	struct kfi_cq_attr	cq_attr = { 0 };
 	struct sockaddr_in	addr = { 0 };
 	int			ret;
-
-	print_trace("in\n");
 
 	connected = 0;
 
@@ -268,8 +259,6 @@ void client_disconnect(simple_context_t *ctx)
 {
 	int ret;
 
-	print_trace("in\n");
-
 	if (connected) {
 		ret = kfi_shutdown(ctx->ep, 0);
 		if (ret)
@@ -325,8 +314,6 @@ int do_test(void)
 	int			eagain_cnt = EAGAIN_TRIES;
 #endif
 
-	print_trace("in\n");
-
 	if (!ctx.buf) {
 		ctx.buf = kmalloc(len, GFP_KERNEL);
 		if (!ctx.buf) {
@@ -335,7 +322,7 @@ int do_test(void)
 		}
 
 		ret = kfi_mr_reg(ctx.domain, ctx.buf, len, 0, 0, 0, 0,
-				&ctx.mr, NULL);
+				&ctx.mr, NULL, NULL);
 		if (ret) {
 			print_err("kfi_mr_reg returned %d\n", ret);
 			kfree(ctx.buf);
@@ -504,8 +491,6 @@ int create_connection(void)
 	ssize_t			n;
 	uint32_t		event;
 	int			ret = -1;
-
-	print_trace("in\n");
 
 	memset(&ctx, 0, sizeof(ctx));
 

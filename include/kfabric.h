@@ -268,7 +268,7 @@ struct kfi_rx_attr {
 };
 
 struct kfi_ep_attr {
-	enum kfi_ep_type		type;
+	enum kfi_ep_type	type;
 	uint32_t		protocol;
 	uint32_t		protocol_version;
 	size_t			max_msg_size;
@@ -373,9 +373,21 @@ struct kfid {
 	atomic_t		ref_cnt;
 };
 
+/*
+ * Retrieve the fabric info based on given hints. Can return a chain of multiple
+ * kfi_info instances.
+ */
 uint32_t kfi_version(void);
-int kfi_getinfo(uint32_t version, struct kfi_info *hints, struct kfi_info **info);
+int kfi_getinfo(uint32_t version, struct kfi_info *hints,
+		struct kfi_info **info);
+
+/*
+ * All fabric info instances returned from kfi_getinfo() should be recycled
+ * through kfi_freeinfo(). If a chain of multiple kfi_info instances are passed,
+ * all instances in the chain will be freed.
+ */
 void kfi_freeinfo(struct kfi_info *info);
+
 struct kfi_info *kfi_dupinfo(const struct kfi_info *info);
 
 struct kfi_ops_fabric {

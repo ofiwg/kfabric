@@ -1,6 +1,7 @@
 
-1) Remove all instances of KFI_* error codes, replace with std linux/errno.h
-   codes.
+1) remove kfi_info.handle field, use kfi_info.connreq instead for IB connection
+   management.
 
-2) Set kfi_strerror() full-text output to be under KFI_DEBUG.
+2) Remove all instances of KFI_* error codes, replace with std linux/errno.h
+   codes.
 

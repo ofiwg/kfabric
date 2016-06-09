@@ -5,11 +5,19 @@ include Kbuild
 else
 
 KVER	:= $(shell uname -r)
+#KVER	:=4.5.0
+
 KDIR	:= /lib/modules/$(KVER)/build
 PWD	:= $(shell pwd)
 INSTALL_MOD_DIR	:= kfabric
 DEPMOD	:= /usr/sbin/depmod
-KSYM	:= /usr/src/compat-rdma/Module.symvers
+
+ifneq ("","$(wildcard /usr/src/compat-rdma)")
+  #for OFED
+  KSYM	:= /usr/src/compat-rdma/Module.symvers
+else
+  KSYM :=
+endif
 
 default:
 	$(MAKE) -C $(KDIR) M=$(PWD) modules KBUILD_EXTRA_SYMBOLS+='$(KSYM)'

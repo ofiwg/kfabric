@@ -115,10 +115,8 @@ int match_provider(struct kfi_info **prov)
 	int			ret;
 
 	/* ibverbs matching provider */
-//XXX	hints.ep_type		= KFI_EP_MSG;
-//XXX	hints.caps		= KFI_MSG | KFI_CANCEL | KFI_SOURCE;
-
-//XXX	hints.addr_format	= KFI_SOCKADDR_IN;
+	hints.caps		= KFI_MSG | KFI_CANCEL | KFI_SOURCE;
+	hints.addr_format	= KFI_SOCKADDR_IN;
 	hints.src_addr		= &addr;
 	hints.src_addrlen	= sizeof(addr);
 
@@ -133,10 +131,8 @@ int match_provider(struct kfi_info **prov)
 		return -EINVAL;
 	}
 
-	hints.fabric_attr		= &attr;
-	hints.fabric_attr->prov_name	= kstrdup("ibverbs", GFP_KERNEL);
-
-	ret = kfi_getinfo(KFI_VERSION(1, 0), &hints, prov);
+	ret = kfi_getinfo(KFI_VERSION(KFI_MAJOR_VERSION, KFI_MINOR_VERSION),
+			  &hints, prov);
 	if (ret) {
 		print_err("ERR: kfi_getinfo() '%s'\n", kfi_strerror(ret));
 		return ret;
