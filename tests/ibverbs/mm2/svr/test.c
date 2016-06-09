@@ -110,7 +110,6 @@ simple_context_t *kfi_to_simple_context(void *ctx)
 int match_provider(struct kfi_info **prov)
 {
 	struct kfi_info		hints = { 0 };
-	struct kfi_fabric_attr	attr = { 0 };
 	struct sockaddr_in	addr = { 0 };
 	int			ret;
 

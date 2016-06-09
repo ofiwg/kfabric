@@ -1,11 +1,8 @@
-Last updated [ Fri June 19 08:44:30 PDT 2015 ]
+Last updated [ Thu Jun  9 15:12:52 PDT 2016 ]
 
 kfi - kernel fabric interface
 
 kfi is based, in spirit, on the usermode OFI (Open Fabric Interface) API.
-
-All modules built as external kernel modules (aka 'uname -r' is the base).
-See './Makefile'.
 
 Currently the build is known to be working for
 	linux-3.12.35,	RHEL 6.6
@@ -15,51 +12,47 @@ kfi/	base kfi (fi_*) entry points and kfi provider registration.
 	kfabric.ko is loaded 1st, then provider(s).
 
 include/
-	header files for providers plus kfi clients. Intent is include/
-	mirrors kernel/include model.
+	header files for providers plus kfi clients.
 
 prov/
   ibverbs/  Infiniband kernel verbs provider: (under development)
-	Supporting:
-		zilch/nada
 
 tests/
     getinfo/	fi_getinfo() test
     ibverbs/
+	simple	full API test.
 	mm2 - 	fi_send() / fi_recv messages between client & server.
 
 Authors:
 	Stan C. Smith <stan.smith@intel.com>
 	Jay E. Sternberg <jay.e.sternberg@intel.com>
+	Frank Yang <Frank.Yang@netapp.com>
+	Chen Zhao <Chen.Zhao@netapp.com>
 
 ===============================================================================
 Building modules:
   $PWD == <...>/kfabric
   make
 
-Loading modules: (mm2 test works if provider works, curent <NULL> provider.
-  KFI framework:	insmod kfi/kfabric.ko
-  KFI null provider:	insmod prov/ibverbs/kfip_ibv.ko
-  KFI test (server):	insmod tests/ibverbs/mm2/svr/kfit_ibv_mm2_srv.ko
-  KFI test (client):	insmod tests/ibverbs/mm2/cli/kfit_ibv_mm2_srv.ko
+Loading modules: (simple test works if provider works, curent <NULL> provider.
+  KFI framework:	insmod kfabric.ko
+  KFI null provider:	insmod kfi_verbs.ko
+  KFI test (API):	insmod kfi_test_simple.ko
 
 ===============================================================================
 Points where KFI and OFI APIs differ plus KFI provider implementation notes.
 
 KFI API definition
 ------------------
-1) fi_getinfo() argument 'portnum' is a string in SFI, in KFI it's an integer.
-   fi_getinfo() remove node, portnum and flags call argument.
+1) kfi_getinfo()
+	removed node, portnum and flags call argument.
+	info.connreq field not used, info.handle replaces until corrected.
+
+2) kfi_mr_reg(..., uint64_t *dma_address)
+	dma_address of registered memory returned.
 
 
 KFI using the ibverbs (OFED/InfiniBand) provider
 ------------------------------------
 
-1) Out of kernel build Failures due to a bug in OFED-3.12 which is fixed by
-changing /usr/src/compat-rdma/linux/kthread.h to define
-CONFIG_COMPAT_IS_KTHREAD before the '#ifndef CONFIG_COMPAT_IS_KTHREAD' line.
-
-Things to do
-------------
-
-Please see TODO file.
+Things to do, please see ./TODO file.
